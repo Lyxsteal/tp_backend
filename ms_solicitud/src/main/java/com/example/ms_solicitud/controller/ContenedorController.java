@@ -22,24 +22,32 @@ import java.util.List;
 //        public ResponseEntity<List<Contenedor>> obtenerTodos() {
 //            return ResponseEntity.ok(contenedorService.);
 //        }
-
+        //get
         @GetMapping("/{idContenedor}")
-        public ResponseEntity<Contenedor> obtenerPorId(@PathVariable Integer id) {
-            return ResponseEntity.ok(contenedorService.obtenerContenedorPorId(id));
+        public ResponseEntity<Contenedor> obtenerPorId(@PathVariable Integer idContenedor) {
+            return ResponseEntity.ok(contenedorService.obtenerContenedorPorId(idContenedor));
         }
-
+        //@GetMapping("/estado/{idContenedor}")
+        //public String consultarEstado(@PathVariable idContenedor){
+            //return contenedorService.obtenerEstado(idContenedor);
+        //}
+        //@GetMapping("/pendientes")
+        //public List<Contenedor> obtenerPendientes(){
+            //return contenedorService.obtenerPendientes();
+        //}
+        //post
         @PostMapping
         public ResponseEntity<Contenedor> crearContenedor(@RequestBody Contenedor contenedor) {
             Contenedor nuevo = contenedorService.crearContenedor(contenedor);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
         }
-
+        //put
         @PutMapping("/{id}")
         public ResponseEntity<Contenedor> actualizarContenedor(@PathVariable Integer id, @RequestBody Contenedor contenedor) {
             Contenedor actualizado = contenedorService.actualizarContenedor(id, contenedor);
             return ResponseEntity.ok(actualizado);
         }
-
+        //delete
         @DeleteMapping("/{id}")
         public ResponseEntity<Void> eliminarContenedor(@PathVariable Integer id) {
             contenedorService.eliminarContenedor(id);
