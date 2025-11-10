@@ -27,14 +27,14 @@ import java.util.List;
         public ResponseEntity<Contenedor> obtenerPorId(@PathVariable Integer idContenedor) {
             return ResponseEntity.ok(contenedorService.obtenerContenedorPorId(idContenedor));
         }
-        //@GetMapping("/estado/{idContenedor}")
-        //public String consultarEstado(@PathVariable idContenedor){
-            //return contenedorService.obtenerEstado(idContenedor);
-        //}
-        //@GetMapping("/pendientes")
-        //public List<Contenedor> obtenerPendientes(){
-            //return contenedorService.obtenerPendientes();
-        //}
+        @GetMapping("/estado/{idContenedor}")
+        public String consultarEstado(@PathVariable Integer idContenedor){
+            return contenedorService.obtenerEstado(idContenedor);
+        }
+        @GetMapping("/pendientes")
+        public List<Contenedor> obtenerPendientes(){
+            return contenedorService.obtenerPendientes();
+        }
         //post
         @PostMapping
         public ResponseEntity<Contenedor> crearContenedor(@RequestBody Contenedor contenedor) {

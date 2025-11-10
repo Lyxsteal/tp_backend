@@ -26,7 +26,7 @@ public class SolicitudController {
 
     @GetMapping("solicitud-por-cliente/{idCliente}")
     public List<Solicitud> obtenerSolicitudesPorClientes(@PathVariable Integer idCliente) {
-        return service.ObtenerSolicitudesPorCliente(idCliente);
+        return service.obtenerSolicitudesPorCliente(idCliente);
     }
 
     @GetMapping("costo-final/{idSolicitud}")
@@ -36,7 +36,7 @@ public class SolicitudController {
     //put
     @PutMapping("estados/{idSolicitud}")
     public ResponseEntity<Solicitud> actualizarEstado(@PathVariable Integer idSolicitud, @RequestBody Solicitud solicitudActualizada){
-    service.actualizarEstado(idSolicitud);
+    service.actualizarEstado(idSolicitud, solicitudActualizada);
     return ResponseEntity.ok(solicitudActualizada);
     }
     //post

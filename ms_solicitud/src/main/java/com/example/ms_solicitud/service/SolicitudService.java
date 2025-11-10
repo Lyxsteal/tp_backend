@@ -60,7 +60,14 @@ public class SolicitudService {
         }
         solicitudRepository.deleteById(id);
     }
-
+    @Transactional
+    public List<Solicitud> obtenerSolicitudesPorCliente(Integer idCliente) {
+        return solicitudRepository.findAllByCliente(idCliente);
+    }
+    @Transactional
+    public Solicitud actualizarEstado(Integer idSolicitud, Solicitud solicitudActualizada) {
+        return solicitudRepository.save(solicitudActualizada);
+    }
 //    @Transactional
 //    public Solicitud calcularCostoFinal(Solicitud solicitud) {
 //
