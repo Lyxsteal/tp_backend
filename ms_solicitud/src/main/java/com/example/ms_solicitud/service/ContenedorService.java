@@ -1,10 +1,12 @@
 package com.example.ms_solicitud.service;
 
-import com.example.ms_solicitud.model.Cliente;
+
 import com.example.ms_solicitud.model.Contenedor;
 import com.example.ms_solicitud.repository.ContenedorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ContenedorService {
@@ -43,6 +45,17 @@ public class ContenedorService {
             throw new RuntimeException("No se puede eliminar. Contenedor no encontrado con ID: " + idContenedor);
         }
         contenedorRepository.deleteById(idContenedor);
+    }
+
+    @Transactional
+    public String obtenerEstado(Integer idContenedor) {
+        Contenedor contenedor = contenedorRepository.findById(idContenedor).orElseThrow(() -> new RuntimeException("Contenedor con id: " + idContenedor + " no encontrado.")) ;
+        return contenedor.getEstado();
+    }
+
+    @Transactional
+    public List<Contenedor> obtenerPendientes(){
+        return contenedorRepository.obtenerPendientes();
     }
 
 
