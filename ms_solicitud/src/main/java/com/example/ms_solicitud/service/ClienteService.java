@@ -37,11 +37,6 @@ public class ClienteService {
 
         Cliente clienteExistente = obtenerClientePorDni(dni);
 
-        clienteExistente.setNombre(clienteActualizado.getNombre());
-        clienteExistente.setApellido(clienteActualizado.getApellido());
-        clienteExistente.setTelefono(clienteActualizado.getTelefono());
-        clienteExistente.setMail(clienteActualizado.getMail());
-
         return clienteRepository.save(clienteExistente);
     }
 

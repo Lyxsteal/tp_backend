@@ -33,13 +33,10 @@ public class TarifaService {
 
     @Transactional
     public Tarifa actualizarTarifa(Integer id, Tarifa tarifaActualizada) {
+
         Tarifa tarifaExistente = obtenerTarifaPorId(id);
 
-        tarifaExistente.setValorFijoTramo(tarifaActualizada.getValorFijoTramo());
-        tarifaExistente.setValorPorVolumen(tarifaActualizada.getValorPorVolumen());
-        tarifaExistente.setValorFijoCombustible(tarifaActualizada.getValorFijoCombustible());
-
-        return tarifaRepository.save(tarifaExistente);
+        return tarifaRepository.save(tarifaActualizada);
     }
 
     @Transactional
