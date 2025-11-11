@@ -18,7 +18,7 @@ public class ClienteController {
     public ClienteController(ClienteService clienteService) { this.service = clienteService;
     }
 
-    public ResponseEntity<Cliente> crearSolicitud (@RequestBody Cliente cliente){
+    public ResponseEntity<Cliente> crearCliente (@RequestBody Cliente cliente){
         service.crearCliente(cliente);
         return ResponseEntity.ok(cliente);
     }

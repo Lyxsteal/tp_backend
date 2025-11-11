@@ -31,11 +31,6 @@ public class ContenedorService {
 
         Contenedor contenedorExistente = obtenerContenedorPorId(idContenedor);
 
-        contenedorExistente.setPeso(contenedorActualizado.getPeso());
-        contenedorExistente.setVolumen(contenedorActualizado.getVolumen());
-        contenedorExistente.setEstado(contenedorActualizado.getEstado());
-        contenedorExistente.setTiempoEstadia(contenedorActualizado.getTiempoEstadia());
-
         return contenedorRepository.save(contenedorExistente);
     }
 

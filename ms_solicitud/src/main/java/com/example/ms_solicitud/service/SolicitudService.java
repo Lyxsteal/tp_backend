@@ -56,18 +56,22 @@ public class SolicitudService {
     @Transactional
     public void eliminarSolicitud(Integer id) {
         if (!solicitudRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. Solicitud no encontrado con ID: " + id);
+            throw new RuntimeException("No se puede eliminar. Solicitud no encontrada con ID: " + id);
         }
         solicitudRepository.deleteById(id);
     }
     @Transactional
     public List<Solicitud> obtenerSolicitudesPorCliente(Integer idCliente) {
+        if (!solicitudRepository.existsById(idCliente)) {
+            throw new RuntimeException("Solicitud no encontrada con ID: " + idCliente);
+        }
         return solicitudRepository.findAllByCliente(idCliente);
     }
     @Transactional
     public Solicitud actualizarEstado(Integer idSolicitud, Solicitud solicitudActualizada) {
         return solicitudRepository.save(solicitudActualizada);
     }
+
 //    @Transactional
 //    public Solicitud calcularCostoFinal(Solicitud solicitud) {
 //
