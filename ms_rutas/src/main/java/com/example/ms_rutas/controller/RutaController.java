@@ -30,7 +30,7 @@ public class RutaController {
     public ResponseEntity<Ruta> crearRuta(@RequestBody Ruta ruta) {
         return ResponseEntity.ok(rutaService.crearRuta(ruta));
     }
-    @PutMapping("/{idRuta}")
+    @PutMapping("/asignacion-tramos/{idRuta}")
     public ResponseEntity<Ruta> asignarTramosARuta(@PathVariable Integer idRuta, @RequestBody List<Tramo> tramos) {
         return ResponseEntity.ok(rutaService.asignarTramosARuta(idRuta, tramos));
     }

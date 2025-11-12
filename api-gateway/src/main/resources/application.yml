@@ -2,19 +2,20 @@ server:
   port: 8083
 
 spring:
+  application:
+    name: api-gateway
   cloud:
     gateway:
       # Rutas de entrada
       routes:
         - id: solicitudes
-          uri: http://localhost:8080
+          uri: http://ms_solicitud:8080
           predicates:
-            - Path=/api/v1/solicitudes/**, /api/v1/clientes/**, /api/v1/tarifas/**, /api/v1/contenedores/**
+            - Path=/api/v1/(solicitudes|clientes|tarifas|contenedores)/**
         - id: rutas
-          uri: http://localhost:8085
+          uri: http://ms_rutas:8085
           predicates:
-            - Path=/api/v1/rutas/**, /api/v1/depositos/**, /api/v1/camioneros/**, /api/v1/camiones/**, /api/v1/tramos/**
-
+            - Path=/api/v1/(rutas|depositos|camioneros|camiones|tramos)/**
       # CORS global (podés ajustar orígenes)
       globalcors:
         corsConfigurations:
@@ -29,4 +30,3 @@ management:
     web:
       exposure:
         include: "health,info,gateway"
-
