@@ -20,7 +20,7 @@ public class Deposito {
     private String direccion;
 
     @JoinColumn(name = "id_ubicacion")
-    @OneToOne(fetch =  FetchType.EAGER)
+    @OneToOne(fetch =  FetchType.EAGER, cascade = CascadeType.ALL)
     Ubicacion ubicacion;
 
     @Column(name = "costo_estadia")
