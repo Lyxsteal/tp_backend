@@ -21,7 +21,7 @@ public class CamionController {
 
 
     //get
-    @GetMapping()
+    @GetMapping("/{camion_patente}")
     public ResponseEntity<Camion>obtenerCamionPorPatente(@PathVariable String camion_patente) {
         return ResponseEntity.ok(camionService.obtenerCamionPorPatente(camion_patente));
     }
@@ -48,7 +48,7 @@ public class CamionController {
         return camionService.obtenerConsumoBaseCamion(patente);
     }
     //put
-    @PutMapping
+    @PutMapping("/{camion_patente}")
     public ResponseEntity<Camion> actualizarCamion(@PathVariable String camion_patente, @RequestBody Camion camion){
         return ResponseEntity.ok(camionService.actualizarCamion(camion_patente, camion));
     }
@@ -56,10 +56,10 @@ public class CamionController {
     @PostMapping
     public ResponseEntity<Camion> crearCamion(@RequestBody Camion camion){
         return ResponseEntity.ok(camionService.crearCamion(camion));
-    }
+    } //revisar tema patente, deberia pasarle patente
 
     //delete
-    @DeleteMapping
+    @DeleteMapping("/{camion_patente}")
     public ResponseEntity<Void> eliminarCamion(@PathVariable String camion_patente){
         camionService.eliminarCamion(camion_patente);
         return ResponseEntity.noContent().build();

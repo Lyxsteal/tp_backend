@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TramoRepository extends JpaRepository<Tramo, Integer> {
-    @Query(value = "SELECT t FROM Tramo t JOIN Camion C ON t.camion.patente = c.patente WHERE c.camionero.cedulaCamionero = :cedula")
+    @Query(value = "SELECT t FROM Tramo t WHERE t.camion.camionero.cedulaCamionero = :cedula")
     List<Tramo> encontrarTramosCamionero(
             @Param("cedula") Integer cedula);
 }
