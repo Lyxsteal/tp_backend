@@ -3,6 +3,8 @@ package com.example.ms_solicitud.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Data
 @Table(name = "SOLICITUD")
@@ -15,6 +17,9 @@ public class Solicitud {
     @Column(name="numero")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int numero;
+
+    @Column(name="ruta_id")
+    private Integer idRuta;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="contenedor_id")

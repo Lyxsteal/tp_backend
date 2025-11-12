@@ -11,8 +11,10 @@ import java.util.List;
 @Service
 public class SolicitudService {
     private final SolicitudRepository solicitudRepository;
-    public SolicitudService( SolicitudRepository solicitudRepository) {
+    private final RutasClient rutasClient;
+    public SolicitudService( SolicitudRepository solicitudRepository , RutasClient rutasClient ) {
         this.solicitudRepository = solicitudRepository;
+        this.rutasClient = rutasClient;
     }
     @Transactional
     public List<Solicitud> obtenerTodosLasSolicitudes() {
@@ -70,6 +72,17 @@ public class SolicitudService {
     @Transactional
     public Solicitud actualizarEstado(Integer idSolicitud, Solicitud solicitudActualizada) {
         return solicitudRepository.save(solicitudActualizada);
+    }
+    @Transactional
+    public Solicitud asignarRuta(Integer isSolicitud, Integer idRuta){
+        Solicitud solicitud = obtenerSolicitudPorNumero(idRuta);
+        boolean rutaExiste = rutasClient.verificarRuta(idRuta);
+        if(!rutaExiste) {
+            throw new RuntimeException("Ruta no existe");
+        }
+
+        solicitud.setIdRuta(idRuta);
+        return solicitudRepository.save(solicitud);
     }
 
 //    @Transactional

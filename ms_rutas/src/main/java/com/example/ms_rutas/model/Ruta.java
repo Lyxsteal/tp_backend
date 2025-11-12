@@ -18,9 +18,6 @@ public class Ruta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRuta;
 
-    @Column(name="idSolicitud")
-    private UUID idSolicitud;
-
     @Column(name="cantidadTramos")
     private Integer cantidadTramos;
 

@@ -1,0 +1,32 @@
+server:
+  port: 8083
+
+spring:
+  cloud:
+    gateway:
+      # Rutas de entrada
+      routes:
+        - id: solicitudes
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/v1/solicitudes/**, /api/v1/clientes/**, /api/v1/tarifas/**, /api/v1/contenedores/**
+        - id: rutas
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/v1/rutas/**, /api/v1/depositos/**, /api/v1/camioneros/**, /api/v1/camiones/**, /api/v1/tramos/**
+
+      # CORS global (podés ajustar orígenes)
+      globalcors:
+        corsConfigurations:
+          "[/**]":
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,gateway"
+
