@@ -2,6 +2,10 @@ package com.example.ms_rutas.service;
 
 import com.example.ms_rutas.model.Camion;
 import com.example.ms_rutas.model.Camionero;
+import com.example.ms_rutas.model.dto.CapacidadRequest;
+import com.example.ms_rutas.model.dto.CapacidadResponse;
+import com.example.ms_rutas.model.dto.ConsumoBaseResponse;
+import com.example.ms_rutas.model.dto.CostoTrasladoResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -49,4 +53,49 @@ public class CamionService {
         }
         camionRepository.deleteById(patente);
     }
+    @Transactional
+    public CapacidadResponse consultarCapacidadCamion(String patente, CapacidadRequest capacidadRequest){
+        Camion camion = camionRepository.findById(patente)
+                .orElseThrow(() -> new RuntimeException("Camion no encontrado con ID: " + patente));
+        CapacidadResponse capacidadResponse = new CapacidadResponse();
+        capacidadResponse.setPatente(camion.getPatente());
+        if (camion.getCapacidadPeso() >= capacidadRequest.getPesoContenedor() && camion.getCapacidadVolumen() >= capacidadRequest.getVolumenContenedor()){
+            capacidadResponse.setCumpleCapacidad(Boolean.TRUE);
+        }else {
+            capacidadResponse.setCumpleCapacidad(Boolean.FALSE);
+        }
+        return capacidadResponse;
+    }
+    @Transactional
+    public List<Camion> obtenerCamionesAptos(CapacidadRequest capacidadRequest){
+        Double pesoContenedor = capacidadRequest.getPesoContenedor();
+        Double volumenContenedor = capacidadRequest.getVolumenContenedor();
+        List<Camion> camionesAptos = camionRepository.encontrarDisponibles(pesoContenedor, volumenContenedor);
+        if(camionesAptos.isEmpty()){
+            throw new RuntimeException("Camion aptos no encontrados");}
+        else{
+            return camionesAptos;
+            }
+    }
+    @Transactional
+    public CostoTrasladoResponse obtenerCostoBaseCamion(String patente){
+         Camion camion= camionRepository.findById(patente)
+                 .orElseThrow(() -> new RuntimeException("Camion no encontrado con ID: " + patente));
+         CostoTrasladoResponse costoTrasladoResponse = new CostoTrasladoResponse();
+         costoTrasladoResponse.setPatente(camion.getPatente());
+         costoTrasladoResponse.setCostoBaseTraslado(camion.getCostoBaseTraslado());
+         return costoTrasladoResponse;
+
+    }
+
+    @Transactional
+    public ConsumoBaseResponse obtenerConsumoBaseCamion(String patente){
+        Camion camion = camionRepository.findById(patente)
+                .orElseThrow(() -> new RuntimeException("Camion no encontrado con ID: " + patente));
+        ConsumoBaseResponse consumoBaseResponse = new ConsumoBaseResponse();
+        consumoBaseResponse.setPatente(camion.getPatente());
+        consumoBaseResponse.setConsumoBase(camion.getConsCombKm());
+        return consumoBaseResponse;
+    }
+
 }

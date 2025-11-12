@@ -27,7 +27,7 @@ public class Camion {
     private Boolean disponibilidad;
 
     @Column(name="costo_base_traslado")
-    private Double costoBaseTraslado;
+    private Float costoBaseTraslado;
 
     @Column(name = "cons_comb_km")
     private Float consCombKm;

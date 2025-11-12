@@ -1,16 +1,41 @@
 package com.example.ms_rutas.controller;
 
 
+import com.example.ms_rutas.model.Deposito;
+import com.example.ms_rutas.model.Ruta;
+import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.service.DepositoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/depositos")
 @RequiredArgsConstructor
 public class DepositoController {
+    private final DepositoService depositoService;
     //get
+    @GetMapping()
+    public List<Deposito> obtenerTodosLosDepositos(){
+        return depositoService.obtenerTodosLosDepositos();
+    }
     //put
+    @PutMapping("/{idDeposito}")
+    public ResponseEntity<Deposito> actualizardeposito(@PathVariable Integer idDeposito , @RequestBody Deposito deposito) {
+        return ResponseEntity.ok(depositoService.actualizarDeposito(idDeposito, deposito));
+    }
     //post
+    @PostMapping()
+    public ResponseEntity<Deposito> crearDeposito(@RequestBody Deposito deposito){
+        return ResponseEntity.ok(depositoService.crearDeposito(deposito));
+    }
+
     //delete
+    @DeleteMapping
+    public ResponseEntity<Void> eliminarDesposito(@PathVariable Integer idDeposito) {
+            depositoService.eliminarDeposito(idDeposito);
+       return ResponseEntity.noContent().build();
+    }
 }

@@ -1,4 +1,68 @@
 package com.example.ms_rutas.controller;
 
+import com.example.ms_rutas.model.Camion;
+import com.example.ms_rutas.model.dto.CapacidadRequest;
+import com.example.ms_rutas.model.dto.CapacidadResponse;
+import com.example.ms_rutas.model.dto.ConsumoBaseResponse;
+import com.example.ms_rutas.model.dto.CostoTrasladoResponse;
+import com.example.ms_rutas.service.CamionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("api/v1/camiones")
+@RequiredArgsConstructor
 public class CamionController {
+    private final CamionService camionService;
+
+
+    //get
+    @GetMapping()
+    public ResponseEntity<Camion>obtenerCamionPorPatente(@PathVariable String camion_patente) {
+        return ResponseEntity.ok(camionService.obtenerCamionPorPatente(camion_patente));
+    }
+
+    @GetMapping("/capacidad-maxima/{patente}")
+    public CapacidadResponse consultarCapacidadMaxima(@PathVariable String patente, @RequestBody CapacidadRequest capacidadRequest){
+        return camionService.consultarCapacidadCamion(patente,capacidadRequest);
+    }
+
+
+    //get
+    @GetMapping("/camiones-aptos")
+    public ResponseEntity<List<Camion>>ObtenerCamionesAptos(@RequestBody CapacidadRequest capacidadRequest) {
+        return ResponseEntity.ok(camionService.obtenerCamionesAptos(capacidadRequest));
+    }
+    //get
+    @GetMapping("/costo-base/{patente}")
+    public CostoTrasladoResponse ObtenerCostoBaseDelCamion(@PathVariable String camion_patente) {
+        return camionService.obtenerCostoBaseCamion(camion_patente);
+    }
+    //get
+    @GetMapping("/consumo-prom/{patente}")
+    public ConsumoBaseResponse ObtenerConsumoBase(@PathVariable String patente) {
+        return camionService.obtenerConsumoBaseCamion(patente);
+    }
+    //put
+    @PutMapping
+    public ResponseEntity<Camion> actualizarCamion(@PathVariable String camion_patente, @RequestBody Camion camion){
+        return ResponseEntity.ok(camionService.actualizarCamion(camion_patente, camion));
+    }
+    //post
+    @PostMapping
+    public ResponseEntity<Camion> crearCamion(@RequestBody Camion camion){
+        return ResponseEntity.ok(camionService.crearCamion(camion));
+    }
+
+    //delete
+    @DeleteMapping
+    public ResponseEntity<Void> eliminarCamion(@PathVariable String camion_patente){
+        camionService.eliminarCamion(camion_patente);
+        return ResponseEntity.noContent().build();
+    }
 }
+

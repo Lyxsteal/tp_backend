@@ -1,6 +1,7 @@
 package com.example.ms_rutas.service;
 
 import com.example.ms_rutas.model.Ruta;
+import com.example.ms_rutas.model.Tramo;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,5 +44,13 @@ public class RutaService {
             throw new RuntimeException("No se puede eliminar. Ruta no encontrada con id: " + id);
         }
         rutaRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Ruta asignarTramosARuta(Integer idRuta, List<Tramo> tramos) {
+        Ruta ruta = rutaRepository.findById(idRuta)
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+        ruta.setTramos(tramos);
+        return rutaRepository.save(ruta);
     }
 }
