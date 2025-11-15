@@ -1,29 +1,48 @@
 server:
   port: 8083
-
 spring:
   application:
     name: api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/tp_backend
+      client:
+        provider:
+          keycloak:
+            # Esta URI ya la tienes en docker-compose, pero es bueno dejarla aquí si no usas env
+            issuer-uri: http://keycloak:8080/realms/tp_backend
+        registration:
+          keycloak: # Debe coincidir con el ID del proveedor (keycloak)
+            client-id: tp_backend_client
+            redirect-uri: http://localhost:8083/login/oauth2/code/{registrationId}
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
   cloud:
     gateway:
-      # Rutas de entrada
       routes:
+        - id: whoami-local
+          uri: forward:/gateway/whoami
+          predicates:
+            - Path=/gateway/whoami
         - id: solicitudes
-          uri: http://ms_solicitud:8080
+          uri: http://ms_solicitud:8081
           predicates:
             - Path=/api/v1/(solicitudes|clientes|tarifas|contenedores)/**
         - id: rutas
           uri: http://ms_rutas:8085
           predicates:
             - Path=/api/v1/(rutas|depositos|camioneros|camiones|tramos)/**
-      # CORS global (podés ajustar orígenes)
-      globalcors:
-        corsConfigurations:
-          "[/**]":
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
+      server:
+        webflux:
+          globalcors:
+            corsConfigurations:
+              "[/**]":
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: true
 
 management:
   endpoints:
