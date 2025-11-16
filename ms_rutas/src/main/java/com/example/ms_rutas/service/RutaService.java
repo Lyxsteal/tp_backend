@@ -2,6 +2,8 @@ package com.example.ms_rutas.service;
 
 import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.model.Ubicacion;
+import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,5 +54,34 @@ public class RutaService {
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
         ruta.setTramos(tramos);
         return rutaRepository.save(ruta);
+    }
+
+    @Transactional
+    public CostoFinalDto obtenerCostos(Integer idruta) {
+        Ruta ruta = rutaRepository.findById(idruta);
+        Double distanciaTotal = obtenerDistanciaTotal(ruta.getTramos());
+
+
+        CostoFinalDto costo = new CostoFinalDto();
+    }
+
+    public Double obtenerDistanciaTotal(List<Tramo> tramos){
+        Double distanciaTotal = 0.0;
+
+        if (tramos == null || tramos.size() < 2) {
+            return 0.0;
+        }
+
+        for (int i = 0; i < tramos.size() ; i++) {
+            distanciaTotal += calcularDistancia(tramos.get(i));
+        }
+
+        return distanciaTotal;
+
+    }
+    public Double calcularDistancia(Tramo tramo){
+        Ubicacion origen = tramo.getUbicacionOrigen();
+        Ubicacion destino = tramo.getUbicacionDestino();
+        
     }
 }

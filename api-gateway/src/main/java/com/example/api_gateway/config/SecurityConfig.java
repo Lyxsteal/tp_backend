@@ -84,10 +84,8 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
 
-                // Habilita el flujo de login (redirección a Keycloak)
                 .oauth2Login(Customizer.withDefaults())
 
-                // Habilita la validación de tokens JWT (para llamadas de API)
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return http.build();
@@ -103,7 +101,7 @@ public class SecurityConfig {
 
             Collection<String> roles = (Collection<String>) realmAccess.get("roles");
             return roles.stream()
-                    .map(roleName -> "ROLE_" + roleName.toUpperCase()) // -> "ROLE_ADMIN", "ROLE_CLIENTE"
+                    .map(roleName -> "ROLE_" + roleName.toUpperCase())
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         });

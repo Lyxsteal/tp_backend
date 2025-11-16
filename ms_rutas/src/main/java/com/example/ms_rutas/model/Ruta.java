@@ -27,4 +27,7 @@ public class Ruta {
     @OneToMany(mappedBy = "ruta")
     private List<Tramo> tramos;
 
+
+
+
 }
