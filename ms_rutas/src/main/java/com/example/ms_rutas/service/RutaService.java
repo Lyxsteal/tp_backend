@@ -7,16 +7,16 @@ import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RutaService {
     private final RutaRepository rutaRepository;
+    private final DistanciaClient distanciaClient;
 
-    public RutaService(RutaRepository rutaRepository) {
-        this.rutaRepository = rutaRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<Ruta> obtenerTodosLasRutas() {
@@ -58,11 +58,11 @@ public class RutaService {
 
     @Transactional
     public CostoFinalDto obtenerCostos(Integer idruta) {
-        Ruta ruta = rutaRepository.findById(idruta);
+        Ruta ruta = rutaRepository.findById(idruta)
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
         Double distanciaTotal = obtenerDistanciaTotal(ruta.getTramos());
-
-
         CostoFinalDto costo = new CostoFinalDto();
+        return costo;
     }
 
     public Double obtenerDistanciaTotal(List<Tramo> tramos){
@@ -82,6 +82,8 @@ public class RutaService {
     public Double calcularDistancia(Tramo tramo){
         Ubicacion origen = tramo.getUbicacionOrigen();
         Ubicacion destino = tramo.getUbicacionDestino();
+        String coordenadas = origen.getLongitud()"," + origen.getLatitud() + ";" + destino.getLongitud() + "," + destino.getLatitud();
+        return distanciaClient.obtenerDistancia(coordenadas);
         
     }
 }

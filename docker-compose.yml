@@ -1,5 +1,12 @@
 services:
-
+  api-gateway:
+    build:
+      context: .  # Asegúrate que esta ruta es correcta. Si el Dockerfile está en la raíz, usa context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
   ms_rutas:
     build:
       context: .
