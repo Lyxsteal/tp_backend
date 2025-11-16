@@ -21,4 +21,5 @@ public class RutasClient {
             return false; // si devolvió 404 o error → no existe
         }
     }
+    public  getRuta(Integer rutaId) {}
 }

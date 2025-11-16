@@ -26,6 +26,7 @@ curl --location --request POST 'http://localhost:8080/realms/tp_backend/protocol
 echo "Metodo verificar token (whoAmI)"
 curl -i -H "Authorization: Bearer 120c5a3e-9ab7-4e0c-9493-fc100c1f4c5a.1a9df3a2-6444-4269-abc6-b6674e8185b6.0483e72b-957e-476a-ad7b-7e4555f123cd" http://localhost:8083/gateway/whoami
 
+
 server:
   port: 8083
 
