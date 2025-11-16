@@ -34,10 +34,10 @@ public class SolicitudController {
         return service.obtenerSolicitudesPorCliente(idCliente);
     }
 
-   /* @GetMapping("costo-final/{idSolicitud}")
-    public Double calcularCostoFinal(@PathVariable Integer idSolicitud) {
+   @GetMapping("costo-final/{idSolicitud}")
+    public Float calcularCostoFinal(@PathVariable Integer idSolicitud) {
         return service.calcularCostoFinal(idSolicitud);
-    }*/
+    }
     //put
     @PutMapping("estados/{idSolicitud}")
     public ResponseEntity<Solicitud> actualizarEstado(@PathVariable Integer idSolicitud, @RequestBody Solicitud solicitudActualizada){

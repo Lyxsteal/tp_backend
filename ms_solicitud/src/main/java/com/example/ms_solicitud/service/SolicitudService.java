@@ -85,10 +85,11 @@ public class SolicitudService {
         return solicitudRepository.save(solicitud);
     }
 
-//    @Transactional
-//    public Solicitud calcularCostoFinal(Solicitud solicitud) {
-//
-//
-//    }
+   @Transactional
+   public Float calcularCostoFinal(Integer idSolicitud) {
+        Integer idRuta = solicitudRepository.findById(idSolicitud).get().getIdRuta();
+
+
+   }
 
 }

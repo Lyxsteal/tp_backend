@@ -15,7 +15,6 @@ spring:
                     keycloak:
                         client-id: tp_backend_client
                         authorization-grant-type: authorization_code
-                        # Usamos la URI de redirección por defecto que Spring Security espera.
                         redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
                         scope: openid, profile, email
 
@@ -27,13 +26,13 @@ spring:
                   predicates:
                       - Path=/gateway/whoami
                 - id: rutas
-                  uri: http://ms_rutas:8085
+                  uri: "http://ms_rutas:8085"
                   predicates:
                     - Path=/api/v1/rutas/**,/api/v1/depositos/**,/api/v1/camioneros/**,/api/v1/camiones/**,/api/v1/tramos/**
                 - id: solicitudes
                   uri: "http://ms_solicitud:8081"
                   predicates:
-                    - Path=/api/v1/solicitudes/**, /api/v1/clientes/**, /api/v1/tarifas/**, /api/v1/contenedores/**
+                    - Path=/api/v1/solicitudes/**,/api/v1/clientes/**,/api/v1/tarifas/**,/api/v1/contenedores/**
 
 server:
     port: 8083
