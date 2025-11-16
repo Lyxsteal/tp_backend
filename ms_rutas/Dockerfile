@@ -5,7 +5,7 @@ WORKDIR /build
 
 # Copiar todos los pom.xml para cachear las dependencias
 COPY pom.xml .
-COPY api-gateway/pom.xml ./api-gateway/
+COPY gateway/pom.xml ./gateway/
 COPY ms_solicitud/pom.xml ./ms_solicitud/
 COPY ms_rutas/pom.xml ./ms_rutas/
 

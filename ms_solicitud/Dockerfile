@@ -23,5 +23,5 @@ FROM eclipse-temurin:21-jdk
 WORKDIR /app
 ARG JAR_NAME=ms_solicitud-0.0.1-SNAPSHOT.jar
 COPY --from=build /build/ms_solicitud/target/${JAR_NAME} app.jar
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]

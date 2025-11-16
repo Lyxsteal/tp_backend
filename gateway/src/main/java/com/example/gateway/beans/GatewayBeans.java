@@ -1,4 +1,4 @@
-package backend.grupo73.gateway.beans;
+package com.example.gateway.beans;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
