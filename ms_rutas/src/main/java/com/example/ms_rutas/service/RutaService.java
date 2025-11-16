@@ -7,16 +7,28 @@ import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+<<<<<<< HEAD
+=======
+import lombok.RequiredArgsConstructor;
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
 import java.util.List;
 
 @Service
+<<<<<<< HEAD
 public class RutaService {
     private final RutaRepository rutaRepository;
 
     public RutaService(RutaRepository rutaRepository) {
         this.rutaRepository = rutaRepository;
     }
+=======
+@RequiredArgsConstructor
+public class RutaService {
+    private final RutaRepository rutaRepository;
+    private final DistanciaClient distanciaClient;
+
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
     @Transactional(readOnly = true)
     public List<Ruta> obtenerTodosLasRutas() {
@@ -57,9 +69,15 @@ public class RutaService {
     }
 
     @Transactional
+<<<<<<< HEAD
     public CostoFinalDto obtenerCostos(Integer idRuta) {
         Ruta ruta = rutaRepository.findById(idRuta)
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada con ID: " + idRuta));;
+=======
+    public CostoFinalDto obtenerCostos(Integer idruta) {
+        Ruta ruta = rutaRepository.findById(idruta)
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
         Double distanciaTotal = obtenerDistanciaTotal(ruta.getTramos());
         CostoFinalDto costo = new CostoFinalDto();
         return costo;
@@ -82,6 +100,12 @@ public class RutaService {
     public Double calcularDistancia(Tramo tramo){
         Ubicacion origen = tramo.getUbicacionOrigen();
         Ubicacion destino = tramo.getUbicacionDestino();
+<<<<<<< HEAD
         return 0.0;
+=======
+        String coordenadas = origen.getLongitud()"," + origen.getLatitud() + ";" + destino.getLongitud() + "," + destino.getLatitud();
+        return distanciaClient.obtenerDistancia(coordenadas);
+        
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
     }
 }

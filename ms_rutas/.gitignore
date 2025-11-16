@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
+=======
+.orsm-data
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f

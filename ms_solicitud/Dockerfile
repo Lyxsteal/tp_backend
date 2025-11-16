@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # --- ETAPA 1: Construcción (Build) ---
 # Usar Java 21 para compilar
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
@@ -7,10 +8,20 @@ WORKDIR /build
 COPY pom.xml .
 
 # 2. Copia los POM de TODOS los módulos
+=======
+# Etapa 1: Construir la aplicación
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+WORKDIR /build
+
+# Copiar todos los pom.xml para cachear las dependencias
+COPY pom.xml .
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 COPY api-gateway/pom.xml ./api-gateway/
 COPY ms_solicitud/pom.xml ./ms_solicitud/
 COPY ms_rutas/pom.xml ./ms_rutas/
 
+<<<<<<< HEAD
 # 3. Descarga las dependencias de TODO el proyecto
 RUN mvn dependency:go-offline
 
@@ -41,3 +52,21 @@ EXPOSE 8081
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
+=======
+# Descargar dependencias (esta capa se cachea)
+RUN mvn -pl ./ms_solicitud -am dependency:go-offline
+
+# Copiar el código fuente
+COPY ms_solicitud/src/ ./ms_solicitud/src/
+
+# Construir la aplicación usando las dependencias cacheadas
+RUN mvn -pl ./ms_solicitud -am -DskipTests clean package spring-boot:repackage
+
+# Etapa 2: Crear la imagen final
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+ARG JAR_NAME=ms_solicitud-0.0.1-SNAPSHOT.jar
+COPY --from=build /build/ms_solicitud/target/${JAR_NAME} app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "app.jar"]
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f

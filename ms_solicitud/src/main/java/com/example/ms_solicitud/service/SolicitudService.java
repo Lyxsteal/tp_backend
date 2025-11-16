@@ -88,8 +88,12 @@ public class SolicitudService {
    @Transactional
    public Float calcularCostoFinal(Integer idSolicitud) {
         Integer idRuta = solicitudRepository.findById(idSolicitud).get().getIdRuta();
+<<<<<<< HEAD
         Float costoFinalCalculado = 0.0f;
         return costoFinalCalculado;
+=======
+
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
    }
 

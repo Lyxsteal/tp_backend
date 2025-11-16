@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /build
+=======
+FROM maven:3.9.5-eclipse-temurin-17-alpine AS build
+
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /app
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
 # 1. Copia el archivo POM primero para aprovechar el caché de Docker
 COPY pom.xml .
@@ -18,7 +25,11 @@ RUN mvn package -DskipTests
 # ETAPA 2: LEVANTAMIENTO/EJECUCIÓN (Runtime Stage)
 # Usa una imagen base mínima con solo el JRE para ejecutar el JAR.
 # ----------------------------------------------------
+<<<<<<< HEAD
 FROM eclipse-temurin:21-jre-alpine
+=======
+FROM eclipse-temurin:17-jre-alpine
+>>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
 # Establece el directorio de trabajo
 WORKDIR /app
