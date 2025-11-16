@@ -1,4 +1,4 @@
-package backend.grupo73.gateway.config;
+package com.example.gateway.config;
 
 import java.util.*;
 import java.util.stream.Collectors;
