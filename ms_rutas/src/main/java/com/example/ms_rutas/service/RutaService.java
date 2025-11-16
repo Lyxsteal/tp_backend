@@ -7,28 +7,20 @@ import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-<<<<<<< HEAD
-=======
+
 import lombok.RequiredArgsConstructor;
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
+
 
 import java.util.List;
 
 @Service
-<<<<<<< HEAD
-public class RutaService {
-    private final RutaRepository rutaRepository;
 
-    public RutaService(RutaRepository rutaRepository) {
-        this.rutaRepository = rutaRepository;
-    }
-=======
+
 @RequiredArgsConstructor
 public class RutaService {
     private final RutaRepository rutaRepository;
     private final DistanciaClient distanciaClient;
 
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 
     @Transactional(readOnly = true)
     public List<Ruta> obtenerTodosLasRutas() {
@@ -69,43 +61,45 @@ public class RutaService {
     }
 
     @Transactional
-<<<<<<< HEAD
-    public CostoFinalDto obtenerCostos(Integer idRuta) {
-        Ruta ruta = rutaRepository.findById(idRuta)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrada con ID: " + idRuta));;
-=======
+
     public CostoFinalDto obtenerCostos(Integer idruta) {
         Ruta ruta = rutaRepository.findById(idruta)
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
-        Double distanciaTotal = obtenerDistanciaTotal(ruta.getTramos());
+        Double consumo = obtenerConsumoTotal(ruta.getTramos());
+        Integer cantDias = ruta.obtenerDiasEstadia();
         CostoFinalDto costo = new CostoFinalDto();
+        costo.setCantTramos(ruta.getTramos().size());
+        costo.setConsumoTotalComb(consumo);
+        costo.setDiasTotalEstadia(cantDias);
         return costo;
     }
 
-    public Double obtenerDistanciaTotal(List<Tramo> tramos){
-        Double distanciaTotal = 0.0;
+    public Double obtenerConsumoTotal(List<Tramo> tramos){
 
-        if (tramos == null || tramos.size() < 2) {
+        Double consumoTotal = 0.0;
+
+        if (tramos == null || tramos.size() < 1) {
             return 0.0;
         }
 
         for (int i = 0; i < tramos.size() ; i++) {
-            distanciaTotal += calcularDistancia(tramos.get(i));
-        }
+            Double consumoCombustible = calcularDistancia(tramos.get(i)) + tramos.get(i).getCamion().getConsCombKm() / 1000;
+            consumoTotal += consumoCombustible;
 
-        return distanciaTotal;
+        }
+        return consumoTotal;
 
     }
     public Double calcularDistancia(Tramo tramo){
         Ubicacion origen = tramo.getUbicacionOrigen();
         Ubicacion destino = tramo.getUbicacionDestino();
-<<<<<<< HEAD
-        return 0.0;
-=======
-        String coordenadas = origen.getLongitud()"," + origen.getLatitud() + ";" + destino.getLongitud() + "," + destino.getLatitud();
-        return distanciaClient.obtenerDistancia(coordenadas);
-        
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
+
+        String coordenadas = origen.getLongitud() + "," + origen.getLatitud() + ";"
+                + destino.getLongitud() + "," + destino.getLatitud();
+
+        Double distancia = distanciaClient.obtenerDistancia(coordenadas);
+
+        return distancia;
+
     }
 }

@@ -1,6 +1,7 @@
 package com.example.ms_solicitud.service;
 
 import com.example.ms_solicitud.model.Tarifa;
+import com.example.ms_solicitud.model.dto.CostoFinalDto;
 import com.example.ms_solicitud.repository.TarifaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,4 +47,6 @@ public class TarifaService {
         }
         tarifaRepository.deleteById(id);
     }
+
+
 }

@@ -35,7 +35,7 @@ public class SolicitudController {
     }
 
    @GetMapping("costo-final/{idSolicitud}")
-    public Float calcularCostoFinal(@PathVariable Integer idSolicitud) {
+    public Double calcularCostoFinal(@PathVariable Integer idSolicitud) {
         return service.calcularCostoFinal(idSolicitud);
     }
     //put

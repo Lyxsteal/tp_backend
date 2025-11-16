@@ -2,6 +2,7 @@ package com.example.ms_rutas.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -55,10 +56,10 @@ public class Tramo {
     private Float  costoReal;
 
     @Column(name="fecha_hora_inicio")
-    private Date fechaHoraInicio;
+    private LocalDate fechaHoraInicio;
 
     @Column(name="fecha_hora_fin")
-    private Date fechaHoraFin;
+    private LocalDate fechaHoraFin;
 
 
 }

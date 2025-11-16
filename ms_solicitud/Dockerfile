@@ -1,72 +1,36 @@
-<<<<<<< HEAD
 # --- ETAPA 1: Construcción (Build) ---
-# Usar Java 21 para compilar
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /build
 
-# 1. Copia el POM raíz
+# Copiamos el pom raíz y los de cada módulo para cache de dependencias
 COPY pom.xml .
-
-# 2. Copia los POM de TODOS los módulos
-=======
-# Etapa 1: Construir la aplicación
-FROM maven:3.9.6-eclipse-temurin-21 AS build
-
-WORKDIR /build
-
-# Copiar todos los pom.xml para cachear las dependencias
-COPY pom.xml .
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
 COPY api-gateway/pom.xml ./api-gateway/
 COPY ms_solicitud/pom.xml ./ms_solicitud/
 COPY ms_rutas/pom.xml ./ms_rutas/
 
-<<<<<<< HEAD
-# 3. Descarga las dependencias de TODO el proyecto
+# Descargamos dependencias offline (se cachea a menos que cambien los POM)
 RUN mvn dependency:go-offline
 
-# 4. Copia el CÓDIGO FUENTE de todos los módulos
+# Copiamos el código fuente
 COPY api-gateway/src ./api-gateway/src
 COPY ms_solicitud/src ./ms_solicitud/src
 COPY ms_rutas/src ./ms_rutas/src
 
-# 5. Compila SOLO este módulo y sus dependencias
-#    (Reemplazá <nombre-del-modulo> por: api-gateway, ms_solicitud, o ms_rutas)
+# Compilamos SOLO el módulo ms_solicitud junto con sus dependencias
 RUN mvn -DskipTests -pl ./ms_solicitud -am clean package spring-boot:repackage
 
-# ----------------------------------------------------
-# ETAPA 2: LEVANTAMIENTO/EJECUCIÓN (Runtime Stage)
-# ----------------------------------------------------
-# ¡USA JAVA 21 PARA EJECUTAR!
+# --- ETAPA 2: Runtime ---
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# 6. Define la ruta al JAR
+# Variable del JAR generado
 ARG JAR_FILE=/build/ms_solicitud/target/ms_solicitud-0.0.1-SNAPSHOT.jar
 
-# 7. Copia el JAR final de la etapa de build
+# Copiamos el JAR desde la etapa anterior
 COPY --from=build ${JAR_FILE} app.jar
 
-# 8. Expone el puerto
+# Exponemos el puerto del microservicio
 EXPOSE 8081
 
-# Comando para ejecutar la aplicación
+# Ejecutamos la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
-=======
-# Descargar dependencias (esta capa se cachea)
-RUN mvn -pl ./ms_solicitud -am dependency:go-offline
-
-# Copiar el código fuente
-COPY ms_solicitud/src/ ./ms_solicitud/src/
-
-# Construir la aplicación usando las dependencias cacheadas
-RUN mvn -pl ./ms_solicitud -am -DskipTests clean package spring-boot:repackage
-
-# Etapa 2: Crear la imagen final
-FROM eclipse-temurin:21-jdk
-WORKDIR /app
-ARG JAR_NAME=ms_solicitud-0.0.1-SNAPSHOT.jar
-COPY --from=build /build/ms_solicitud/target/${JAR_NAME} app.jar
-EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f

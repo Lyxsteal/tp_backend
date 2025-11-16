@@ -5,33 +5,32 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: routes-service
-          uri: "http://ms_rutas:8085"
-          predicates:
-            - Path=/api/rutas/**
-            - Path=/api/camiones/**
-            - Path=/api/ubicaciones/**
-            - Path=/api/tramos/**
-            - Path=/api/camiones/**
-            - Path=/api/depositos/**
-        - id: solicitud-service
-          uri: "http://ms_solicitud:8081"
-          predicates:
-            - Path=/api/solicitudes/**
-            - Path=/api/tarifas/**
-            - Path=/api/contenedores/**
-            - Path=/api/clientes/**
 
+        # --------------------- RUTAS SERVICE ---------------------
+        - id: ms-rutas
+          uri: http://ms_rutas:8085
+          predicates:
+            - Path=/api/v1/rutas/**
+            - Path=/api/v1/ciudades/**
+            - Path=/api/v1/rutas/tramos/**
+            - Path=/api/v1/rutas/camiones/**
+            - Path=/api/v1/rutas/depositos/**
+
+        # ------------------ SOLICITUD SERVICE ---------------------
+        - id: ms-solicitud
+          uri: http://ms_solicitud:8081
+          predicates:
+            - Path=/api/v1/solicitudes/**
+            - Path=/api/v1/tarifas/**
+            - Path=/api/v1/contenedores/**
+            - Path=/api/v1/clientes/**
+
+      # ---------------------- GLOBAL CORS -------------------------
       globalcors:
         cors-configurations:
-          '[/**]':
+          "[/**]":
             allowedOrigins: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
+            allowedMethods: "*"
             allowedHeaders: "*"
             maxAge: 3600
 
@@ -50,6 +49,7 @@ management:
 logging:
   level:
     org.springframework.cloud.gateway: INFO
-    com.example.gateway: DEBUG
+    com.example.api_gateway: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+

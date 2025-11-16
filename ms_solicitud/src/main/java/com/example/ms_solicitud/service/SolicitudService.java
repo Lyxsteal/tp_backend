@@ -2,6 +2,7 @@ package com.example.ms_solicitud.service;
 
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
+import com.example.ms_solicitud.model.dto.CostoFinalDto;
 import com.example.ms_solicitud.repository.SolicitudRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -86,14 +87,14 @@ public class SolicitudService {
     }
 
    @Transactional
-   public Float calcularCostoFinal(Integer idSolicitud) {
-        Integer idRuta = solicitudRepository.findById(idSolicitud).get().getIdRuta();
-<<<<<<< HEAD
-        Float costoFinalCalculado = 0.0f;
-        return costoFinalCalculado;
-=======
+   public Double calcularCostoFinal(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        Integer idRuta = solicitud.getIdRuta();
+        CostoFinalDto costo = rutasClient.getCostos(idRuta);
 
->>>>>>> f581931c1e0854a69fad4d91b4014d970ada910f
+        Double costoFinalCalculado = solicitud.getIdTarifa().calcularCostos(costo,solicitud.getNumeroContenedor().getVolumen()) ;
+        return costoFinalCalculado;
+
 
    }
 

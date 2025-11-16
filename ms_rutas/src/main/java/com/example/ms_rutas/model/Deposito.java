@@ -23,10 +23,6 @@ public class Deposito {
     @OneToOne(fetch =  FetchType.EAGER, cascade = CascadeType.ALL)
     Ubicacion ubicacion;
 
-    @Column(name = "costo_estadia")
-    private Float costoEstadia;
-
-
 }
 /*identificacion | PK
 nombre

@@ -1,5 +1,6 @@
 package com.example.ms_solicitud.model;
 
+import com.example.ms_solicitud.model.dto.CostoFinalDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,14 +18,25 @@ public class Tarifa {
     private int idTarifa;
 
     @Column(name="valorFijoTramo")
-    private float valorFijoTramo;
+    private Double valorFijoTramo;
 
 
     @Column(name="valorPorVolumen")
-    private float valorPorVolumen;
+    private Double valorPorVolumen;
 
 
     @Column(name="valorFijoCombustible")
-    private float valorFijoCombustible;
+    private Double valorFijoCombustible;
+
+    @Column(name = "valorPorEstadia")
+    private Double valorPorEstadia;
+
+    public Double calcularCostos(CostoFinalDto costos, Double volumenContenedor){
+        Double totalTramos = valorFijoTramo * costos.getCantTramos();
+        Double totalComb = valorFijoCombustible * costos.getConsumoTotalComb();
+        Double totalestadia = valorPorEstadia * costos.getDiasTotalEstadia();
+        Double totalVolumen = valorPorVolumen * volumenContenedor;
+        return totalTramos + totalComb + totalestadia + totalVolumen;
+    }
 
 }
