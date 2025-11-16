@@ -2,6 +2,7 @@ package com.example.ms_rutas.controller;
 
 import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.service.RutaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,10 @@ public class RutaController {
     }
 
     //get
+    @GetMapping("/costos/{idRuta}")
+    public CostoFinalDto getCostos(@PathVariable Integer idRuta) {
+        return rutaService.obtenerCostos(idRuta);
+    }
     //put
     @PutMapping({"/{idRuta}"})
     public ResponseEntity<Ruta> actualizarRuta(@PathVariable Integer idRuta, @RequestBody Ruta ruta) {

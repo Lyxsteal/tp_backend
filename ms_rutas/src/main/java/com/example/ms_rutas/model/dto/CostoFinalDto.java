@@ -1,4 +1,4 @@
-package com.example.ms_solicitud.model.dto;
+package com.example.ms_rutas.model.dto;
 
 import lombok.Data;
 

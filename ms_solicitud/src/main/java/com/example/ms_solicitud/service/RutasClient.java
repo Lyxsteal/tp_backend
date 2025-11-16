@@ -1,6 +1,7 @@
 package com.example.ms_solicitud.service;
 
 
+import com.example.ms_solicitud.model.dto.CostoFinalDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,5 +22,8 @@ public class RutasClient {
             return false; // si devolvió 404 o error → no existe
         }
     }
-    public  getRuta(Integer rutaId) {}
+    public CostoFinalDto getCostos(Integer rutaId) {
+        String url = "http://localhost:8085/api/v1/rutas/costos" + rutaId;
+        return restTemplate.getForObject(url, CostoFinalDto.class);
+    }
 }
