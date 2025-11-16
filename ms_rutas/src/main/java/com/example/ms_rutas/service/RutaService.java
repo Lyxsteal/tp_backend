@@ -57,12 +57,12 @@ public class RutaService {
     }
 
     @Transactional
-    public CostoFinalDto obtenerCostos(Integer idruta) {
-        Ruta ruta = rutaRepository.findById(idruta);
+    public CostoFinalDto obtenerCostos(Integer idRuta) {
+        Ruta ruta = rutaRepository.findById(idRuta)
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada con ID: " + idRuta));;
         Double distanciaTotal = obtenerDistanciaTotal(ruta.getTramos());
-
-
         CostoFinalDto costo = new CostoFinalDto();
+        return costo;
     }
 
     public Double obtenerDistanciaTotal(List<Tramo> tramos){
@@ -82,6 +82,6 @@ public class RutaService {
     public Double calcularDistancia(Tramo tramo){
         Ubicacion origen = tramo.getUbicacionOrigen();
         Ubicacion destino = tramo.getUbicacionDestino();
-        
+        return 0.0;
     }
 }

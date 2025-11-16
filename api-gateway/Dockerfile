@@ -21,7 +21,7 @@ COPY ms_rutas/src ./ms_rutas/src
 
 # 5. Compila SOLO este módulo y sus dependencias
 #    (Reemplazá <nombre-del-modulo> por: api-gateway, ms_solicitud, o ms_rutas)
-RUN mvn -DskipTests -pl ./ms_rutas -am clean package spring-boot:repackage
+RUN mvn -DskipTests -pl ./api-gateway -am clean package spring-boot:repackage
 
 # ----------------------------------------------------
 # ETAPA 2: LEVANTAMIENTO/EJECUCIÓN (Runtime Stage)
@@ -31,13 +31,13 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # 6. Define la ruta al JAR
-ARG JAR_FILE=/build/ms_rutas/target/ms_rutas-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=/build/api-gateway/target/api-gateway-0.0.1-SNAPSHOT.jar
 
 # 7. Copia el JAR final de la etapa de build
 COPY --from=build ${JAR_FILE} app.jar
 
 # 8. Expone el puerto
-EXPOSE 8085
+EXPOSE 8083
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]

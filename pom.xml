@@ -34,7 +34,7 @@
 
     <modules>
         <module>ms_solicitud</module>
-        <module>gateway</module>
+        <module>api-gateway</module>
         <module>ms_rutas</module>
     </modules>
 
