@@ -84,8 +84,6 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
 
-                .oauth2Login(Customizer.withDefaults())
-
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return http.build();
