@@ -1,55 +1,60 @@
 spring:
+  application:
+    name: api-gateway
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: "http://localhost:8083/realms/tp_backend"
+          issuer-uri: http://keycloak:8080/realms/tp_backend
+          jwk-set-uri: http://keycloak:8080/realms/tp_backend/protocol/openid-connect/certs
 
-      client: {}
-
-  application:
-    name: api-gateway
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://keycloak:8080/realms/tp_backend
+        registration:
+          keycloak:
+            client-id: tp_backend
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+            scope: openid, profile, email
 
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            # --------------------- RUTAS SERVICE (ms_rutas:8085) ---------------------
-            - id: ms-rutas
-              uri: "http://ms_rutas:8085"
-              predicates:
-                - Path=/api/v1/rutas/**
-                - Path=/api/v1/ciudades/**
-                - Path=/api/v1/tramos/**
-                - Path=/api/v1/camiones/**
-                - Path=/api/v1/depositos/**
-            # ------------------ SOLICITUD SERVICE (ms_solicitud:8081) ---------------------
-            - id: ms-solicitud
-              uri: "http://ms_solicitud:8081"
-              predicates:
-                - Path=/api/v1/solicitudes/**
-                - Path=/api/v1/tarifas/**
-                - Path=/api/v1/contenedores/**
-                - Path=/api/v1/clientes/**
-          # ---------------------- GLOBAL CORS -------------------------
-          globalcors:
-            cors-configurations:
-              "[/**]":
-                allowedOrigins: "*"
-                allowedMethods: "*"
-                allowedHeaders: "*"
-                maxAge: 3600
+      routes:
+        - id: ms-solicitud
+          uri: http://ms_solicitud:8081
+          predicates:
+            - Path=/api/v1/solicitudes/**
+          filters:
+            - StripPrefix=0
 
-# ----------------------------------------------------
-# 3. CONFIGURACIÓN DEL SERVIDOR (Puerto 8083)
-# ----------------------------------------------------
+        - id: ms-rutas
+          uri: http://ms_rutas:8085
+          predicates:
+            - Path=/api/v1/rutas/**
+          filters:
+            - StripPrefix=0
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            maxAge: 3600
+            allowCredentials: false
+
 server:
   port: 8083
 
-# ----------------------------------------------------
-# 4. ACTUATOR Y LOGGING
-# ----------------------------------------------------
 management:
   endpoints:
     web:
@@ -63,5 +68,8 @@ logging:
   level:
     org.springframework.cloud.gateway: INFO
     com.example.api_gateway: DEBUG
+    org.springframework.security: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+

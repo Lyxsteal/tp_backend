@@ -41,6 +41,11 @@ public class SecurityConfig {
                         // --- 3. RUTAS DE CLIENTE ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/clientes").hasRole("CLIENTE")
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/clientes/*").hasRole("CLIENTE")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/{id}").hasRole("CLIENTE")
 
                         // --- 4. RUTAS DE ADMIN (Específicas de Solicitud) ---
                         // (Estas deben ir ANTES que la regla general de CLIENTE /api/v1/solicitudes/*)
@@ -50,7 +55,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/costo-final/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/costo-tiempo-real/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/api/v1/solicitudes/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/solicitudes/**").hasRole("ADMIN")
 
                         // --- 5. RUTAS DE ADMIN (Rutas, Camiones, Usuarios, etc.) ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/rutas").hasRole("ADMIN")
@@ -76,9 +81,6 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/*").hasAnyRole("ADMIN", "TRANSPORTISTA")
 
                         // --- 7. RUTAS GENERALES DE CLIENTE (Al final) ---
-                        // (Esta es la última regla de "solicitudes" porque es la menos específica)
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/*").hasRole("CLIENTE")
-
                         // --- 8. CIERRE ---
                         // (Cualquier otra ruta no definida aquí, requiere al menos estar autenticado)
                         .anyExchange().authenticated()

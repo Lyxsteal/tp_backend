@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-    @RequestMapping("/api/v1/contenedores")
+    @RequestMapping("/api/v1/solicitudes/contenedores")
     public class ContenedorController {
 
         private final ContenedorService contenedorService;

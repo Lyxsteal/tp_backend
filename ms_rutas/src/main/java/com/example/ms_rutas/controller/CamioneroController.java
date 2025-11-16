@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/camioneros")
+@RequestMapping("api/v1/rutas/camioneros")
 @RequiredArgsConstructor
 public class CamioneroController {
     private final CamioneroService camioneroService;

@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1/ubicacion")
+@RequestMapping("api/v1/rutas/ubicaciones")
 public class UbicacionController {
     private final UbicacionService ubicacionService;
 
