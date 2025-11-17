@@ -6,23 +6,24 @@ import com.example.ms_rutas.model.dto.CapacidadRequest;
 import com.example.ms_rutas.model.dto.CapacidadResponse;
 import com.example.ms_rutas.model.dto.ConsumoBaseResponse;
 import com.example.ms_rutas.model.dto.CostoTrasladoResponse;
+import com.example.ms_rutas.repository.CamioneroRepository;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.ms_rutas.repository.CamionRepository;
 
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @Service
 public class CamionService {
     private final CamionRepository camionRepository;
-    public CamionService(CamionRepository camionRepository) {
-        this.camionRepository = camionRepository;
-    }
+    private final CamioneroRepository camioneroRepository;
+
 
     @Transactional(readOnly = true)
     public List<Camion> obtenerTodasLosCamiones() {
@@ -37,6 +38,13 @@ public class CamionService {
 
     @Transactional
     public Camion crearCamion(Camion camion) {
+        Integer cedula = camion.getCamionero().getCedulaCamionero();
+
+        Camionero camioneroExistente = camioneroRepository.findById(cedula)
+                .orElseThrow(() -> new RuntimeException("Camionero no encontrado con cédula: " + cedula));
+
+        // 3. Reemplazar el objeto Camionero parcial por el objeto gestionado
+        camion.setCamionero(camioneroExistente);
         return camionRepository.save(camion);
     }
 

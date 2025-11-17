@@ -66,7 +66,9 @@ public class RutaService {
         Ruta ruta = rutaRepository.findById(idruta)
                 .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
         Double consumo = obtenerConsumoTotal(ruta.getTramos());
+        System.out.println(consumo);
         Integer cantDias = ruta.obtenerDiasEstadia();
+        System.out.println(cantDias);
         CostoFinalDto costo = new CostoFinalDto();
         costo.setCantTramos(ruta.getTramos().size());
         costo.setConsumoTotalComb(consumo);
@@ -83,7 +85,7 @@ public class RutaService {
         }
 
         for (int i = 0; i < tramos.size() ; i++) {
-            Double consumoCombustible = calcularDistancia(tramos.get(i)) + tramos.get(i).getCamion().getConsCombKm() / 1000;
+            Double consumoCombustible = calcularDistancia(tramos.get(i)) * tramos.get(i).getCamion().getConsCombKm() / 1000;
             consumoTotal += consumoCombustible;
 
         }
@@ -98,6 +100,8 @@ public class RutaService {
                 + destino.getLongitud() + "," + destino.getLatitud();
 
         Double distancia = distanciaClient.obtenerDistancia(coordenadas);
+
+        System.out.println("distancia: " + distancia + " km");
 
         return distancia;
 

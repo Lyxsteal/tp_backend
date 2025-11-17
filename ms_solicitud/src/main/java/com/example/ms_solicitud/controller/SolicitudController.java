@@ -59,6 +59,10 @@ public class SolicitudController {
     public ResponseEntity<Solicitud> asignarRuta(@PathVariable Integer idSolicitud, @RequestBody Integer idRuta){
         return ResponseEntity.ok(service.asignarRuta(idSolicitud, idRuta));
     }
+    @PutMapping("asignar-tarifa/{idSolicitud}")
+    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Tarifa tarifa){
+        return ResponseEntity.ok(service.asignarTarifa(idSolicitud, tarifa));
+    }
     //post
     @PostMapping
     public ResponseEntity<Solicitud> crearSolicitud (@RequestBody Solicitud solicitud){

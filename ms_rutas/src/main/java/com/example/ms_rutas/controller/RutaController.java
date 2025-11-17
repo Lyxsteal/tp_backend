@@ -17,8 +17,15 @@ public class RutaController {
     public RutaController(RutaService rutaService) {
         this.rutaService = rutaService;
     }
-
+    @GetMapping
+    public ResponseEntity<List<Ruta>> getRutas() {
+        return ResponseEntity.ok(rutaService.obtenerTodosLasRutas());
+    }
     //get
+    @GetMapping("/{idRuta}")
+    public ResponseEntity<Ruta> getRutaPorId(@PathVariable Integer idRuta) {
+        return ResponseEntity.ok(rutaService.obtenerRutaPorId(idRuta));
+    }
     @GetMapping("/costos/{idRuta}")
     public CostoFinalDto getCostos(@PathVariable String idRuta) {
         Integer numeroRuta = Integer.parseInt(idRuta);

@@ -1,6 +1,7 @@
 package com.example.ms_rutas.controller;
 
 import com.example.ms_rutas.model.Camion;
+import com.example.ms_rutas.model.Deposito;
 import com.example.ms_rutas.model.dto.CapacidadRequest;
 import com.example.ms_rutas.model.dto.CapacidadResponse;
 import com.example.ms_rutas.model.dto.ConsumoBaseResponse;
@@ -19,7 +20,10 @@ import java.util.Map;
 public class CamionController {
     private final CamionService camionService;
 
-
+    @GetMapping()
+    public List<Camion> obtenerTodosLosCamiones(){
+        return camionService.obtenerTodasLosCamiones();
+    }
     //get
     @GetMapping("/{camion_patente}")
     public ResponseEntity<Camion>obtenerCamionPorPatente(@PathVariable String camion_patente) {

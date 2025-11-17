@@ -14,7 +14,7 @@ public class Camion {
     private String patente;
 
     @JoinColumn(name = "id_camionero")
-    @OneToOne(fetch =  FetchType.LAZY)
+    @OneToOne(fetch =  FetchType.EAGER)
     private Camionero camionero;
 
     @Column(name="capacidad_peso")

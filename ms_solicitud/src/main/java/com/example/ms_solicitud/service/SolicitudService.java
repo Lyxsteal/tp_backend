@@ -1,22 +1,27 @@
 package com.example.ms_solicitud.service;
 
+import com.example.ms_solicitud.model.Cliente;
+import com.example.ms_solicitud.model.Contenedor;
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
 import com.example.ms_solicitud.model.dto.CostoFinalDto;
+import com.example.ms_solicitud.repository.ClienteRepository;
+import com.example.ms_solicitud.repository.ContenedorRepository;
 import com.example.ms_solicitud.repository.SolicitudRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SolicitudService {
     private final SolicitudRepository solicitudRepository;
     private final RutasClient rutasClient;
-    public SolicitudService( SolicitudRepository solicitudRepository , RutasClient rutasClient ) {
-        this.solicitudRepository = solicitudRepository;
-        this.rutasClient = rutasClient;
-    }
+    private final ClienteRepository clienteRepository;
+    private final ContenedorRepository contenedorRepository;
+
     @Transactional
     public List<Solicitud> obtenerTodosLasSolicitudes() {
         return solicitudRepository.findAll();
@@ -33,6 +38,13 @@ public class SolicitudService {
         if (solicitudRepository.existsById(solicitud.getNumero())) {
             throw new RuntimeException("Ya existe una solicitud con el numero: " + solicitud.getNumero());
         }
+        //ver si existe el cliente
+        if (!clienteRepository.existsById(solicitud.getDniCliente().getDni())) {
+            Cliente cliente = clienteRepository.save(solicitud.getDniCliente());
+        }
+        //crea el contenedor
+        Contenedor contenedor = contenedorRepository.save(solicitud.getNumeroContenedor());
+
         return solicitudRepository.save(solicitud);
     }
 
@@ -75,14 +87,22 @@ public class SolicitudService {
         return solicitudRepository.save(solicitudActualizada);
     }
     @Transactional
-    public Solicitud asignarRuta(Integer isSolicitud, Integer idRuta){
-        Solicitud solicitud = obtenerSolicitudPorNumero(idRuta);
+    public Solicitud asignarRuta(Integer idSolicitud, Integer idRuta){
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
         boolean rutaExiste = rutasClient.verificarRuta(idRuta);
         if(!rutaExiste) {
             throw new RuntimeException("Ruta no existe");
         }
 
         solicitud.setIdRuta(idRuta);
+        return solicitudRepository.save(solicitud);
+    }
+
+    @Transactional
+    public Solicitud asignarTarifa(Integer idSolicitud, Tarifa tarifa){
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+
+        solicitud.setIdTarifa(tarifa);
         return solicitudRepository.save(solicitud);
     }
 

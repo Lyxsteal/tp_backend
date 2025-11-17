@@ -22,7 +22,7 @@ public class Tramo {
 
     @JoinColumn(name="idRuta")
     @ManyToOne(fetch = FetchType.EAGER)
-    private  Ruta ruta;
+    private Ruta ruta;
 
     @Column(name="nro_orden")
     private Integer  nroOrden;

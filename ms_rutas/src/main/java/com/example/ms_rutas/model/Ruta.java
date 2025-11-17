@@ -1,6 +1,7 @@
 package com.example.ms_rutas.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,7 @@ public class Ruta {
     @Column(name="cantidadDepositos")
     private Integer cantidadDepositos;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "ruta")
     private List<Tramo> tramos;
 

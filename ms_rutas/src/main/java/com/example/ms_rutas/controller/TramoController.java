@@ -1,8 +1,6 @@
 package com.example.ms_rutas.controller;
 
-import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
-import com.example.ms_rutas.service.CamionService;
 import com.example.ms_rutas.service.TramoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,10 @@ import java.util.List;
 public class TramoController {
     private final TramoService tramoService;
 
+    @GetMapping
+    public ResponseEntity<List<Tramo>> getTramos() {
+        return ResponseEntity.ok(tramoService.obtenerTodasLosTramos());
+    }
     @PutMapping("/camion/{idTramo}")
     public ResponseEntity<Tramo> AsignarCamionATramo(@PathVariable Integer idTramo, @RequestBody String camion_patente ) {
         return ResponseEntity.ok(tramoService.asignarCamionATramo(idTramo,camion_patente));

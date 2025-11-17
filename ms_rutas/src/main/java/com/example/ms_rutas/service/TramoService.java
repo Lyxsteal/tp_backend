@@ -1,9 +1,7 @@
 package com.example.ms_rutas.service;
 
-import com.example.ms_rutas.model.Camion;
-import com.example.ms_rutas.model.Tramo;
-import com.example.ms_rutas.repository.CamionRepository;
-import com.example.ms_rutas.repository.TramoRepository;
+import com.example.ms_rutas.model.*;
+import com.example.ms_rutas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,6 +14,10 @@ import java.util.List;
 public class TramoService {
     private final TramoRepository tramoRepository;
     private final CamionRepository camionRepository;
+    private final RutaRepository rutaRepository;
+    private final UbicacionRepository ubicacionRepository;
+    private final TipoTramoRepository tipoTramoRepository;
+
 
     @Transactional(readOnly = true)
     public List<Tramo> obtenerTodasLosTramos() {
@@ -30,6 +32,23 @@ public class TramoService {
 
     @Transactional
     public Tramo crearTramo(Tramo tramo) {
+        Ruta ruta = rutaRepository.findById(tramo.getRuta().getIdRuta())
+                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+        tramo.setRuta(ruta);
+
+        // 2. Cargar Ubicaciones
+        Ubicacion origen = ubicacionRepository.findById(tramo.getUbicacionOrigen().getIdUbicacion())
+                .orElseThrow(() -> new RuntimeException("Ubicación Origen no encontrada"));
+        tramo.setUbicacionOrigen(origen);
+
+        Ubicacion destino = ubicacionRepository.findById(tramo.getUbicacionDestino().getIdUbicacion())
+                .orElseThrow(() -> new RuntimeException("Ubicación Destino no encontrada"));
+        tramo.setUbicacionDestino(destino);
+
+        // 3. Cargar TipoTramo
+        TipoTramo tipo = tipoTramoRepository.findById(tramo.getTipoTramo().getIdTipoTramo())
+                .orElseThrow(() -> new RuntimeException("Tipo de Tramo no encontrado"));
+        tramo.setTipoTramo(tipo);
         return tramoRepository.save(tramo);
     }
 
