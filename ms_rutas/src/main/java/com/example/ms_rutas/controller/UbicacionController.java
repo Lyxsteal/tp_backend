@@ -34,7 +34,7 @@ public class UbicacionController {
     }
 
     //delete
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarUbicacion(@PathVariable Integer id) {
         ubicacionService.eliminarUbicacion(id);
         return ResponseEntity.noContent().build();

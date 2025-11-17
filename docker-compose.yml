@@ -28,6 +28,8 @@ services:
       APP_MS_RUTAS_BASE_URL: http://ms_rutas:8085
     networks: [backend]
     depends_on: [keycloak]
+    volumes:
+      - solicitudes-data:/data
 
   ms_rutas:
     build:
@@ -40,6 +42,8 @@ services:
       SERVER_PORT: 8085
     networks: [backend]
     depends_on: [keycloak, ms_solicitud]
+    volumes:
+      - rutas-data:/data
 
   api-gateway:
     build:
@@ -59,3 +63,7 @@ networks:
 
 volumes:
   keycloak-data:
+  solicitudes-data:
+    driver: local
+  rutas-data:
+    driver: local

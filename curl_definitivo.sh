@@ -116,14 +116,15 @@ echo ""
 
 # --- RutaController ---
 echo "[RutaController]"
+echo "GET COSTO DE RUTA 1"
 curl "http://localhost:8085/api/v1/rutas/costos/1"
-echo ""
+echo "POST DE RUTA"
 curl -X POST -H "Content-Type: application/json" -d '{"cantidadTramos": 2, "cantidadDepositos": 0, "tramos": []}' "http://localhost:8085/api/v1/rutas"
-echo ""
+echo "ACTUALIZAR RUTA 1"
 curl -X PUT -H "Content-Type: application/json" -d '{"idRuta": 1, "cantidadTramos": 3, "cantidadDepositos": 1}' "http://localhost:8085/api/v1/rutas/1"
-echo ""
+echo "ASIGNAR TRAMO A UNA RUTA"
 curl -X PUT -H "Content-Type: application/json" -d '[{"nroOrden": 1, "ubicacionOrigen": {"idUbicacion": 10}, "ubicacionDestino": {"idUbicacion": 11}, "tipoTramo": {"idTipoTramo": 1}, "estadoTramo": "PENDIENTE"}]' "http://localhost:8085/api/v1/rutas/asignacion-tramos/1"
-echo ""
+echo "ELIMINAR RUTA 1"
 # NOTA: El @DeleteMapping no tiene "/{id}". Asumo que debería ser "api/v1/rutas/1".
 curl -X DELETE "http://localhost:8085/api/v1/rutas/1"
 echo ""
@@ -131,21 +132,18 @@ echo ""
 
 # --- TramoController ---
 echo "[TramoController]"
-curl "http://localhost:8085/api/v1/tramos/tramos-asignados/200"
-echo ""
-curl -X POST -H "Content-Type: application/json" -d '{"ruta": {"idRuta": 1}, "nroOrden": 2, "ubicacionOrigen": {"idUbicacion": 11}, "ubicacionDestino": {"idUbicacion": 12}, "tipoTramo": {"idTipoTramo": 1}, "estadoTramo": "PENDIENTE"}' "http://localhost:8085/api/v1/tramos"
-echo ""
-curl -X PUT -H "Content-Type: application/json" -d '"EN_CURSO"' "http://localhost:8085/api/v1/tramos/1"
-echo ""
+echo "GET TRAMOS ASIGNADOS DEL CAMIONERO CEDULA 200"
+curl "http://localhost:8085/api/v1/solicitudes/tramos/tramos-asignados/200"
+echo "POST DE UN TRAMO"
+curl -X POST -H "Content-Type: application/json" -d '{"ruta": {"idRuta": 1}, "nroOrden": 2, "ubicacionOrigen": {"idUbicacion": 11}, "ubicacionDestino": {"idUbicacion": 12}, "tipoTramo": {"idTipoTramo": 1}, "estadoTramo": "PENDIENTE"}' "http://localhost:8085/api/v1/solicitudes/tramos"
+echo "ACTUALIZAR ESTADO DE UN TRAMO"
+curl -X PUT -H "Content-Type: application/json" -d '"EN_CURSO"' "http://localhost:8085/api/v1/solicitudes/tramos/1"
+echo "ACTUALIZAR TRAMO "
 # NOTA: Hay un @PutMapping sin path. Asumo que es "api/v1/tramos/1".
-curl -X PUT -H "Content-Type: application/json" -d '{"idTramo": 1, "nroOrden": 1, "estadoTramo": "COMPLETADO"}' "http://localhost:8085/api/v1/tramos/1"
-echo ""
-# NOTA: El endpoint AsignarCamionATramo está roto. La anotación de URL no coincide con los parámetros del método.
-# Anotación: @PutMapping("/camion/{patente}")
-# Método: (@PathVariable Integer idTramo, @RequestBody String camion_patente)
-# El 'idTramo' no está en la URL, y 'patente' de la URL no se usa. Este comando fallará.
-curl -X PUT -H "Content-Type: application/json" -d '"XYZ789"' "http://localhost:8085/api/v1/tramos/camion/ABC123"
-echo ""
+curl -X PUT -H "Content-Type: application/json" -d '{"idTramo": 1, "nroOrden": 1, "estadoTramo": "COMPLETADO"}' "http://localhost:8085/api/v1/solicitudes/tramos/1"
+echo "ASIGNAR CAMION A TRAMO"
+curl -X PUT -H "Content-Type: application/json" -d '"XYZ789"' "http://localhost:8085/api/v1/solicitudes/tramos/camion/ABC123"
+echo "ELIMINAR TRAMO 1"
 # NOTA: El @DeleteMapping no tiene "/{id}". Asumo que debería ser "api/v1/tramos/1".
 curl -X DELETE "http://localhost:8085/api/v1/tramos/1"
 echo ""
@@ -153,12 +151,13 @@ echo ""
 
 # --- UbicacionController ---
 echo "[UbicacionController]"
+echo "GET UNA UBICACION"
 curl "http://localhost:8085/api/v1/ubicacion/10"
-echo ""
+echo "CREAR UBICACION"
 curl -X POST -H "Content-Type: application/json" -d '{"direccion": "Punto de Carga A", "latitud": -34.55, "longitud": -58.45}' "http://localhost:8085/api/v1/ubicacion"
-echo ""
+echo "ACTUALIZAR UBICACION"
 curl -X PUT -H "Content-Type: application/json" -d '{"idUbicacion": 10, "direccion": "Punto de Carga A (Corregido)", "latitud": -34.551, "longitud": -58.451}' "http://localhost:8085/api/v1/ubicacion/10"
-echo ""
+echo "ELIMINAR UBICACION"
 # NOTA: El @DeleteMapping no tiene "/{id}". Asumo que debería ser "api/v1/ubicacion/10".
 curl -X DELETE "http://localhost:8085/api/v1/ubicacion/10"
 echo ""

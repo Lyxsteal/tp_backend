@@ -41,7 +41,7 @@ public class RutaController {
     }
 
     //delete
-    @DeleteMapping
+    @DeleteMapping({"/id"})
     public ResponseEntity<Void> eliminarRuta(@PathVariable Integer id) {
         rutaService.eliminarRuta(id);
         return ResponseEntity.noContent().build();

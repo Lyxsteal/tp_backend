@@ -16,7 +16,7 @@ import java.util.List;
 public class TramoController {
     private final TramoService tramoService;
 
-    @PutMapping("/camion/{patente}")
+    @PutMapping("/camion/{idTramo}")
     public ResponseEntity<Tramo> AsignarCamionATramo(@PathVariable Integer idTramo, @RequestBody String camion_patente ) {
         return ResponseEntity.ok(tramoService.asignarCamionATramo(idTramo,camion_patente));
 
@@ -29,13 +29,13 @@ public class TramoController {
     //put
 
     //put
-    @PutMapping("/{idTramo}")
+    @PutMapping("/estado/{idTramo}")
     public ResponseEntity<Tramo> ActualizarEstadoTramo(@PathVariable Integer idTramo,@RequestBody String estadotramo) {
         return ResponseEntity.ok(tramoService.actualizarEstadoTramo(idTramo,estadotramo));
     }
 
     //put
-    @PutMapping
+    @PutMapping("/{idTramo}")
     public ResponseEntity<Tramo> actualizarTramo(@PathVariable Integer id, @RequestBody Tramo tramo) {
         return ResponseEntity.ok(tramoService.actualizarTramo(id, tramo));
     }
@@ -47,7 +47,7 @@ public class TramoController {
     }
 
     //delete
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTramo(@PathVariable Integer id) {
         tramoService.eliminarTramo(id);
         return ResponseEntity.noContent().build();

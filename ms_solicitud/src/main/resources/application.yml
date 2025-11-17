@@ -12,5 +12,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
 springdoc:
   swagger-ui.path: /swagger-ui.html

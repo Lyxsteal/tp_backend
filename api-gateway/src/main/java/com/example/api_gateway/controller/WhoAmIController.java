@@ -20,34 +20,26 @@ public class WhoAmIController { // O en la clase que prefieras
      */
     @GetMapping("/gateway/whoami")
     public Mono<Map<String, Object>> whoami() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(auth -> {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    result.put("authenticated", auth.isAuthenticated());
+                    result.put("username", auth.getName());
 
-        Mono<SecurityContext> contextMono = ReactiveSecurityContextHolder.getContext();
+                    Object principal = auth.getPrincipal();
 
-        Mono<Authentication> authMono = contextMono.map(securityContext -> securityContext.getAuthentication());
+                    if (principal instanceof Jwt jwt) {
+                        result.put("type", "JWT");
+                        result.put("email", jwt.getClaim("email"));
+                        result.put("roles", jwt.getClaim("realm_access"));
+                        result.put("expiresAt", jwt.getExpiresAt());
+                    }
 
-        return authMono.map(auth -> {
-
-            Map<String, Object> out = new LinkedHashMap<>();
-            out.put("authenticated", auth.isAuthenticated());
-            out.put("authorities", auth.getAuthorities());
-            out.put("name", auth.getName());
-
-            Object p = auth.getPrincipal();
-
-            if (p instanceof Jwt jwt) {
-                out.put("principal_type", "Jwt");
-                out.put("email", jwt.getClaim("email"));
-                out.put("issuer", jwt.getIssuer());
-            }
-            else if (p instanceof OidcUser oidcUser) {
-                out.put("principal_type", "OidcUser");
-                out.put("email", oidcUser.getEmail());
-                out.put("full_name", oidcUser.getFullName());
-            }
-
-            return out;
-        });
+                    return result;
+                });
     }
+
 
     @GetMapping("/gateway/whoami-corto")
     public Mono<Map<String, Object>> whoamiShort() {
