@@ -14,14 +14,14 @@ public class RutasClient {
 
     // Inyectamos la URL desde las propiedades/variables de entorno
     public RutasClient(RestTemplate restTemplate,
-                       @Value("${app.ms-rutas.base-url}") String msRutasBaseUrl) {
+                       @Value("${APP_MS_RUTAS_BASE_URL}") String msRutasBaseUrl) {
         this.restTemplate = restTemplate;
         this.msRutasBaseUrl = msRutasBaseUrl;
     }
 
     public boolean verificarRuta(Integer rutaId) {
         // Usamos la URL base + el endpoint
-        String url = "http://ms_rutas:8085/api/v1/rutas/" + rutaId;
+        String url = msRutasBaseUrl + "/api/v1/rutas/" + rutaId;
 
         try {
             restTemplate.getForObject(url, Object.class);

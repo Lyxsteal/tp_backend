@@ -24,21 +24,27 @@ public class GatewayTokenFilter {
                         String username = jwt.getClaimAsString("preferred_username");
                         var roles = jwt.getClaimAsStringList("realm_access.roles");
 
+                        // Evitar NPE
+                        String rolesHeader = (roles == null || roles.isEmpty())
+                                ? ""
+                                : String.join(",", roles);
+
                         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                                 .headers(httpHeaders -> {
-                                    httpHeaders.remove(HttpHeaders.AUTHORIZATION); // ❌ remover token
-                                    httpHeaders.add("X-User-Id", userId);
-                                    httpHeaders.add("X-Username", username);
-                                    httpHeaders.add("X-Roles", String.join(",", roles));
+                                    httpHeaders.remove(HttpHeaders.AUTHORIZATION); // No reenviar token
+
+                                    if (userId != null)       httpHeaders.add("X-User-Id", userId);
+                                    if (username != null)     httpHeaders.add("X-Username", username);
+                                    if (!rolesHeader.isEmpty()) httpHeaders.add("X-Roles", rolesHeader);
                                 })
                                 .build();
 
-                        ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-                        return chain.filter(mutatedExchange);
+                        return chain.filter(exchange.mutate().request(mutatedRequest).build());
                     }
 
                     return chain.filter(exchange);
                 });
     }
 }
+
 

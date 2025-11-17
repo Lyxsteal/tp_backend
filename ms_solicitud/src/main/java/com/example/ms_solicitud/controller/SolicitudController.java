@@ -2,8 +2,11 @@ package com.example.ms_solicitud.controller;
 
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
+import com.example.ms_solicitud.security.AuthenticatedUser;
+import com.example.ms_solicitud.security.UserHeaderInterceptor;
 import com.example.ms_solicitud.service.ContenedorService;
 import com.example.ms_solicitud.service.SolicitudService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +21,15 @@ public class SolicitudController {
     private final SolicitudService service;
 
     @GetMapping
-    public ResponseEntity<List<Solicitud>> obtenerSolicitudes() {
-        return ResponseEntity.ok(service.obtenerTodosLasSolicitudes());
+    public ResponseEntity<List<Solicitud>> obtenerSolicitudes(HttpServletRequest request) {
+
+        AuthenticatedUser user = (AuthenticatedUser) request.getAttribute(UserHeaderInterceptor.USER_ATTR);
+
+        System.out.println("USER => " + user);
+
+        List<Solicitud> lista = service.obtenerTodosLasSolicitudes();
+
+        return ResponseEntity.ok(lista);
     }
     //get
     @GetMapping("/{idSolicitud}")
