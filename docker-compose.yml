@@ -16,32 +16,32 @@ services:
       - ./realms:/opt/keycloak/data/import
       - keycloak-data:/opt/keycloak/data
 
-  ms_solicitud:
+  ms-solicitud:
     build:
       context: .
       dockerfile: ms_solicitud/Dockerfile
-    container_name: ms_solicitud
+    container_name: ms-solicitud
     ports:
       - "8081:8081"
     environment:
       SERVER_PORT: 8081
-      APP_MS_RUTAS_BASE_URL: http://ms_rutas:8085
+      APP_MS_RUTAS_BASE_URL: http://ms-rutas:8085
     networks: [backend]
     depends_on: [keycloak]
     volumes:
       - solicitudes-data:/data
 
-  ms_rutas:
+  ms-rutas:
     build:
       context: .
       dockerfile: ms_rutas/Dockerfile
-    container_name: ms_rutas
+    container_name: ms-rutas
     ports:
       - "8085:8085"
     environment:
       SERVER_PORT: 8085
     networks: [backend]
-    depends_on: [keycloak, ms_solicitud]
+    depends_on: [keycloak, ms-solicitud]
     volumes:
       - rutas-data:/data
 
@@ -49,13 +49,13 @@ services:
     build:
       context: .
       dockerfile: api-gateway/Dockerfile
-    container_name: api_gateway
+    container_name: api-gateway
     ports:
       - "8083:8083"
     environment:
       SPRING_PROFILES_ACTIVE: docker
     networks: [backend]
-    depends_on: [ms_solicitud, ms_rutas, keycloak]
+    depends_on: [ms-solicitud, ms-rutas, keycloak]
 
 networks:
   backend:

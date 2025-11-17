@@ -1,50 +1,53 @@
 package com.example.api_gateway.config;
 
-
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class GatewayTokenFilter {
 
     @Bean
-    public WebFilter propagateUserHeaders() {
-        return (exchange, chain) -> exchange.getPrincipal()
-                .flatMap(principal -> {
-                    if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Jwt jwt) {
+    public GatewayFilter userHeaderPropagationFilter() {
 
-                        String userId = jwt.getSubject();
-                        String username = jwt.getClaimAsString("preferred_username");
-                        var roles = jwt.getClaimAsStringList("realm_access.roles");
+        return new OrderedGatewayFilter((exchange, chain) -> {
+            System.out.println("Incoming Request URL: " + exchange.getRequest().getURI());
+            return exchange.getPrincipal()
+                    .flatMap(principal -> {
 
-                        // Evitar NPE
-                        String rolesHeader = (roles == null || roles.isEmpty())
-                                ? ""
-                                : String.join(",", roles);
+                        if (principal instanceof Authentication auth && auth.getPrincipal() instanceof Jwt jwt) {
 
-                        ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-                                .headers(httpHeaders -> {
-                                    httpHeaders.remove(HttpHeaders.AUTHORIZATION); // No reenviar token
+                            String userId = jwt.getSubject();
+                            String username = jwt.getClaimAsString("preferred_username");
+                            Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+                            List<String> roles = realmAccess != null ? (List<String>) realmAccess.get("roles") : List.of();
 
-                                    if (userId != null)       httpHeaders.add("X-User-Id", userId);
-                                    if (username != null)     httpHeaders.add("X-Username", username);
-                                    if (!rolesHeader.isEmpty()) httpHeaders.add("X-Roles", rolesHeader);
-                                })
-                                .build();
+                            ServerWebExchange mutated = exchange.mutate()
+                                    .request(req -> req.headers(headers -> {
+                                        headers.add("X-User-Id", userId);
+                                        headers.add("X-Username", username);
+                                        headers.add("X-Roles", String.join(",", roles));
+                                    }))
+                                    .build();
+                            System.out.println("Forwarding Request URL: " + mutated.getRequest().getURI());
 
-                        return chain.filter(exchange.mutate().request(mutatedRequest).build());
-                    }
+                            return chain.filter(mutated);
 
-                    return chain.filter(exchange);
-                });
+                        }
+
+                        return chain.filter(exchange);
+                    });
+        }, -1); // Ejecutar temprano
     }
 }
-
 

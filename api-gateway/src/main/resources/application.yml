@@ -12,29 +12,29 @@ spring:
           #http://keycloak:8080/realms/tp_backend
           #jwk-set-uri: http://keycloak:8080/realms/tp_backend/protocol/openid-connect/certs
 
-  #    client:
-   #     provider:
-    #      keycloak:
-     #       issuer-uri: http://keycloak:8080/realms/tp_backend
-      #  registration:
-       #   keycloak:
-        #    client-id: tp_backend
-         #   authorization-grant-type: authorization_code
-          #  redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-           # scope: openid, profile, email
+        client:
+          provider:
+            keycloak:
+             issuer-uri: http://keycloak:8080/realms/tp_backend
+          registration:
+           keycloak:
+              client-id: tp_backend
+           authorization-grant-type: authorization_code
+           redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+           scope: openid, profile, email
 
   cloud:
     gateway:
       routes:
         - id: ms-solicitud
-          uri: "http://ms_solicitud:8081/"
+          uri: http://ms-solicitud:8081
           predicates:
             - Path=/api/v1/solicitudes/**
           filters:
             - StripPrefix=0
 
         - id: ms-rutas
-          uri: "http://ms_rutas:8085/"
+          uri: http://ms-rutas:8085
           predicates:
             - Path=/api/v1/rutas/**
           filters:

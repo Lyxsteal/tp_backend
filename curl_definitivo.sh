@@ -68,49 +68,49 @@ echo "========================================="
 
 # --- CamionController ---
 echo "[CamionController]"
-curl "http://localhost:8085/api/v1/camiones/ABC123"
+curl "http://localhost:8085/api/v1/rutas/camiones/ABC123"
 echo ""
 # NOTA: Un GET con RequestBody es inusual y no es una buena práctica, pero así está definido.
 curl -X GET -H "Content-Type: application/json" -d '{"pesoContenedor": 500.0, "volumenContenedor": 25.0}' "http://localhost:8085/api/v1/camiones/capacidad-maxima/ABC123"
 echo ""
 curl -X GET -H "Content-Type: application/json" -d '{"pesoContenedor": 500.0, "volumenContenedor": 25.0}' "http://localhost:8085/api/v1/camiones/camiones-aptos"
 echo ""
-curl "http://localhost:8085/api/v1/camiones/costo-base/ABC123"
+curl "http://localhost:8085/api/v1/rutas/camiones/costo-base/ABC123"
 echo ""
-curl "http://localhost:8085/api/v1/camiones/consumo-prom/ABC123"
+curl "http://localhost:8085/api/v1/rutas/camiones/consumo-prom/ABC123"
 echo ""
-curl -X POST -H "Content-Type: application/json" -d '{"patente": "XYZ789", "camionero": {"cedulaCamionero": 201}, "capacidadPeso": 12000, "capacidadVolumen": 60, "disponibilidad": true, "costoBaseTraslado": 550.0, "consCombKm": 0.6}' "http://localhost:8085/api/v1/camiones"
+curl -X POST -H "Content-Type: application/json" -d '{"patente": "XYZ789", "camionero": {"cedulaCamionero": 201}, "capacidadPeso": 12000, "capacidadVolumen": 60, "disponibilidad": true, "costoBaseTraslado": 550.0, "consCombKm": 0.6}' "http://localhost:8085/api/v1/rutas/camiones"
 echo ""
-curl -X PUT -H "Content-Type: application/json" -d '{"patente": "ABC123", "camionero": {"cedulaCamionero": 200}, "capacidadPeso": 10000, "capacidadVolumen": 50, "disponibilidad": true, "costoBaseTraslado": 500.0, "consCombKm": 0.5}' "http://localhost:8085/api/v1/camiones/ABC123"
+curl -X PUT -H "Content-Type: application/json" -d '{"patente": "ABC123", "camionero": {"cedulaCamionero": 200}, "capacidadPeso": 10000, "capacidadVolumen": 50, "disponibilidad": true, "costoBaseTraslado": 500.0, "consCombKm": 0.5}' "http://localhost:8085/api/v1/rutas/camiones/ABC123"
 echo ""
-curl -X DELETE "http://localhost:8085/api/v1/camiones/ABC123"
+curl -X DELETE "http://localhost:8085/api/v1/rutas/camiones/ABC123"
 echo ""
 
 
 # --- CamioneroController ---
 echo "[CamioneroController]"
-curl "http://localhost:8085/api/v1/camioneros/200"
+curl "http://localhost:8085/api/v1/rutas/camioneros/200"
 echo ""
-curl -X POST -H "Content-Type: application/json" -d '{"cedulaCamionero": 200, "idUsuario": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", "nombre": "Pedro", "apellido": "Gomez", "telefono": 987654321}' "http://localhost:8085/api/v1/camioneros"
+curl -X POST -H "Content-Type: application/json" -d '{"cedulaCamionero": 200, "idUsuario": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", "nombre": "Pedro", "apellido": "Gomez", "telefono": 987654321}' "http://localhost:8085/api/v1/rutas/camioneros"
 echo ""
 # NOTA: El @PutMapping no tiene "/{cedula}". Asumo que debería ser "api/v1/camioneros/200".
-curl -X PUT -H "Content-Type: application/json" -d '{"cedulaCamionero": 200, "telefono": 111222333}' "http://localhost:8085/api/v1/camioneros/200"
+curl -X PUT -H "Content-Type: application/json" -d '{"cedulaCamionero": 200, "telefono": 111222333}' "http://localhost:8085/api/v1/rutas/camioneros/200"
 echo ""
 # NOTA: El @DeleteMapping no tiene "/{cedula}". Asumo que debería ser "api/v1/camioneros/200".
-curl -X DELETE "http://localhost:8085/api/v1/camioneros/200"
+curl -X DELETE "http://localhost:8085/api/v1/rutas/camioneros/200"
 echo ""
 
 
 # --- DepositoController ---
 echo "[DepositoController]"
-curl "http://localhost:8085/api/v1/depositos"
+curl "http://localhost:8085/api/v1/rutas/depositos"
 echo ""
-curl -X POST -H "Content-Type: application/json" -d '{"nombre": "Deposito Norte", "direccion": "Av. Siempre Viva 742", "ubicacion": {"idUbicacion": 11, "direccion": "Av. Siempre Viva 742", "latitud": -34.5, "longitud": -58.5}, "costoEstadia": 80.0}' "http://localhost:8085/api/v1/depositos"
+curl -X POST -H "Content-Type: application/json" -d '{"nombre": "Deposito Norte", "direccion": "Av. Siempre Viva 742", "ubicacion": {"idUbicacion": 11, "direccion": "Av. Siempre Viva 742", "latitud": -34.5, "longitud": -58.5}, "costoEstadia": 80.0}' "http://localhost:8085/api/v1/rutas/depositos"
 echo ""
-curl -X PUT -H "Content-Type: application/json" -d '{"id": 1, "nombre": "Deposito Central", "direccion": "Calle Falsa 123", "ubicacion": {"idUbicacion": 10}, "costoEstadia": 75.0}' "http://localhost:8085/api/v1/depositos/1"
+curl -X PUT -H "Content-Type: application/json" -d '{"id": 1, "nombre": "Deposito Central", "direccion": "Calle Falsa 123", "ubicacion": {"idUbicacion": 10}, "costoEstadia": 75.0}' "http://localhost:8085/api/v1/rutas/depositos/1"
 echo ""
 # NOTA: El @DeleteMapping no tiene "/{idDeposito}". Asumo que debería ser "api/v1/depositos/1".
-curl -X DELETE "http://localhost:8085/api/v1/depositos/1"
+curl -X DELETE "http://localhost:8085/api/v1/rutas/depositos/1"
 echo ""
 
 
@@ -135,31 +135,31 @@ echo "[TramoController]"
 echo "GET TRAMOS ASIGNADOS DEL CAMIONERO CEDULA 200"
 curl "http://localhost:8085/api/v1/solicitudes/tramos/tramos-asignados/200"
 echo "POST DE UN TRAMO"
-curl -X POST -H "Content-Type: application/json" -d '{"ruta": {"idRuta": 1}, "nroOrden": 2, "ubicacionOrigen": {"idUbicacion": 11}, "ubicacionDestino": {"idUbicacion": 12}, "tipoTramo": {"idTipoTramo": 1}, "estadoTramo": "PENDIENTE"}' "http://localhost:8085/api/v1/solicitudes/tramos"
+curl -X POST -H "Content-Type: application/json" -d '{"ruta": {"idRuta": 1}, "nroOrden": 2, "ubicacionOrigen": {"idUbicacion": 11}, "ubicacionDestino": {"idUbicacion": 12}, "tipoTramo": {"idTipoTramo": 1}, "estadoTramo": "PENDIENTE"}' "http://localhost:8085/api/v1/rutas/tramos"
 echo "ACTUALIZAR ESTADO DE UN TRAMO"
-curl -X PUT -H "Content-Type: application/json" -d '"EN_CURSO"' "http://localhost:8085/api/v1/solicitudes/tramos/1"
+curl -X PUT -H "Content-Type: application/json" -d '"EN_CURSO"' "http://localhost:8085/api/v1/rutas/tramos/1"
 echo "ACTUALIZAR TRAMO "
 # NOTA: Hay un @PutMapping sin path. Asumo que es "api/v1/tramos/1".
-curl -X PUT -H "Content-Type: application/json" -d '{"idTramo": 1, "nroOrden": 1, "estadoTramo": "COMPLETADO"}' "http://localhost:8085/api/v1/solicitudes/tramos/1"
+curl -X PUT -H "Content-Type: application/json" -d '{"idTramo": 1, "nroOrden": 1, "estadoTramo": "COMPLETADO"}' "http://localhost:8085/api/v1/rutas/tramos/1"
 echo "ASIGNAR CAMION A TRAMO"
-curl -X PUT -H "Content-Type: application/json" -d '"XYZ789"' "http://localhost:8085/api/v1/solicitudes/tramos/camion/ABC123"
+curl -X PUT -H "Content-Type: application/json" -d '"XYZ789"' "http://localhost:8085/api/v1/rutas/tramos/camion/ABC123"
 echo "ELIMINAR TRAMO 1"
 # NOTA: El @DeleteMapping no tiene "/{id}". Asumo que debería ser "api/v1/tramos/1".
-curl -X DELETE "http://localhost:8085/api/v1/tramos/1"
+curl -X DELETE "http://localhost:8085/api/v1/rutas/tramos/1"
 echo ""
 
 
 # --- UbicacionController ---
 echo "[UbicacionController]"
 echo "GET UNA UBICACION"
-curl "http://localhost:8085/api/v1/ubicacion/10"
+curl "http://localhost:8085/api/v1/rutas/ubicacion/10"
 echo "CREAR UBICACION"
-curl -X POST -H "Content-Type: application/json" -d '{"direccion": "Punto de Carga A", "latitud": -34.55, "longitud": -58.45}' "http://localhost:8085/api/v1/ubicacion"
+curl -X POST -H "Content-Type: application/json" -d '{"direccion": "Punto de Carga A", "latitud": -34.55, "longitud": -58.45}' "http://localhost:8085/api/v1/rutas/ubicacion"
 echo "ACTUALIZAR UBICACION"
-curl -X PUT -H "Content-Type: application/json" -d '{"idUbicacion": 10, "direccion": "Punto de Carga A (Corregido)", "latitud": -34.551, "longitud": -58.451}' "http://localhost:8085/api/v1/ubicacion/10"
+curl -X PUT -H "Content-Type: application/json" -d '{"idUbicacion": 10, "direccion": "Punto de Carga A (Corregido)", "latitud": -34.551, "longitud": -58.451}' "http://localhost:8085/api/v1/rutas/ubicacion/10"
 echo "ELIMINAR UBICACION"
 # NOTA: El @DeleteMapping no tiene "/{id}". Asumo que debería ser "api/v1/ubicacion/10".
-curl -X DELETE "http://localhost:8085/api/v1/ubicacion/10"
+curl -X DELETE "http://localhost:8085/api/v1/rutas/ubicacion/10"
 echo ""
 
 echo "========================================="
