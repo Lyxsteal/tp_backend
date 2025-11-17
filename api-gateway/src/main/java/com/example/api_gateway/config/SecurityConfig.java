@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .pathMatchers("/gateway/whoami").authenticated() // Tu endpoint de prueba
 
                         // --- 2. RUTAS DE TRANSPORTISTA (Las más específicas) ---
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/asignados/*").hasRole("TRANSPORTISTA")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/asignados/**").hasRole("TRANSPORTISTA")
 
                         // --- 3. RUTAS DE CLIENTE ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/clientes").hasRole("CLIENTE")
@@ -51,24 +51,24 @@ public class SecurityConfig {
                         // (Estas deben ir ANTES que la regla general de CLIENTE /api/v1/solicitudes/*)
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/contenedores/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/estados/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/contenedores/estado/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/contenedores/estado/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/costo-final/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/costo-tiempo-real/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/costo-tiempo-real/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "/api/v1/solicitudes/**").hasRole("ADMIN")
 
                         // --- 5. RUTAS DE ADMIN (Rutas, Camiones, Usuarios, etc.) ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/rutas").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/sugeridos/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/camion/*").hasRole("ADMIN") // Específica
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/sugeridos/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/camion/**").hasRole("ADMIN") 
                         .pathMatchers(HttpMethod.POST, "/api/v1/rutas/depositos").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/depositos/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/depositos/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/rutas/camiones").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/camiones/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/capacidad-maxima/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/camiones/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/capacidad-maxima/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/camiones-aptos").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/costobase/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/consumo-prom/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/costobase/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/consumo-prom/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/ciudades").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/ciudades").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/ciudades/*").hasRole("ADMIN")

@@ -20,8 +20,9 @@ public class RutaController {
 
     //get
     @GetMapping("/costos/{idRuta}")
-    public CostoFinalDto getCostos(@PathVariable Integer idRuta) {
-        return rutaService.obtenerCostos(idRuta);
+    public CostoFinalDto getCostos(@PathVariable String idRuta) {
+        Integer numeroRuta = Integer.parseInt(idRuta);
+        return rutaService.obtenerCostos(numeroRuta);
     }
     //put
     @PutMapping({"/{idRuta}"})
