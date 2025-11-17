@@ -21,6 +21,7 @@ public class DepositoController {
     public List<Deposito> obtenerTodosLosDepositos(){
         return depositoService.obtenerTodosLosDepositos();
     }
+
     //put
     @PutMapping("/{idDeposito}")
     public ResponseEntity<Deposito> actualizardeposito(@PathVariable Integer idDeposito , @RequestBody Deposito deposito) {

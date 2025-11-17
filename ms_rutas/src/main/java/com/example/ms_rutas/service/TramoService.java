@@ -77,6 +77,7 @@ public class TramoService {
     public Tramo asignarCamionATramo(Integer idTramo,String camionPatente) {
         Camion camion = camionRepository.findById(camionPatente)
                 .orElseThrow(() -> new RuntimeException("Camion no encontrado con ID: " + camionPatente));
+        camion.setDisponibilidad(false);
         Tramo tramo = obtenerTramoPorId(idTramo);
         tramo.setCamion(camion);
         return tramoRepository.save(tramo);

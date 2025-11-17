@@ -31,20 +31,27 @@ public class CamionController {
     }
 
     @GetMapping("/capacidad-maxima/{patente}")
-    public CapacidadResponse consultarCapacidadMaxima(@PathVariable String patente, @RequestBody CapacidadRequest capacidadRequest){
-        return camionService.consultarCapacidadCamion(patente,capacidadRequest);
-    }
+    public CapacidadResponse consultarCapacidadMaxima(@PathVariable String patente, @RequestParam Double pesoContenedor, @RequestParam Double volumenContenedor) {
 
+        CapacidadRequest capacidadRequest = new CapacidadRequest();
+        capacidadRequest.setPesoContenedor(pesoContenedor);
+        capacidadRequest.setVolumenContenedor(volumenContenedor);
+
+        return camionService.consultarCapacidadCamion(patente, capacidadRequest);
+    }
 
     //get
     @GetMapping("/camiones-aptos")
-    public ResponseEntity<List<Camion>>ObtenerCamionesAptos(@RequestBody CapacidadRequest capacidadRequest) {
+    public ResponseEntity<List<Camion>>ObtenerCamionesAptos(@RequestParam Double pesoContenedor, @RequestParam Double volumenContenedor) {
+        CapacidadRequest capacidadRequest = new CapacidadRequest();
+        capacidadRequest.setPesoContenedor(pesoContenedor);
+        capacidadRequest.setVolumenContenedor(volumenContenedor);
         return ResponseEntity.ok(camionService.obtenerCamionesAptos(capacidadRequest));
     }
     //get
     @GetMapping("/costo-base/{patente}")
-    public CostoTrasladoResponse ObtenerCostoBaseDelCamion(@PathVariable String camion_patente) {
-        return camionService.obtenerCostoBaseCamion(camion_patente);
+    public CostoTrasladoResponse ObtenerCostoBaseDelCamion(@PathVariable String patente) {
+        return camionService.obtenerCostoBaseCamion(patente);
     }
     //get
     @GetMapping("/consumo-prom/{patente}")

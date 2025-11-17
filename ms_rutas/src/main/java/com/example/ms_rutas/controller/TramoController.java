@@ -18,6 +18,7 @@ public class TramoController {
     public ResponseEntity<List<Tramo>> getTramos() {
         return ResponseEntity.ok(tramoService.obtenerTodasLosTramos());
     }
+
     @PutMapping("/camion/{idTramo}")
     public ResponseEntity<Tramo> AsignarCamionATramo(@PathVariable Integer idTramo, @RequestBody String camion_patente ) {
         return ResponseEntity.ok(tramoService.asignarCamionATramo(idTramo,camion_patente));
@@ -28,7 +29,6 @@ public class TramoController {
         return tramoService.obtenerTramosPorCamionero(cedula);
     }
 
-    //put
 
     //put
     @PutMapping("/estado/{idTramo}")

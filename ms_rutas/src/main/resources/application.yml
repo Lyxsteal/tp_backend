@@ -14,5 +14,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 springdoc:
   swagger-ui.path: /swagger-ui.html
