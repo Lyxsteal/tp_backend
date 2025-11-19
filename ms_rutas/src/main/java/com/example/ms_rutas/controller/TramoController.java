@@ -1,5 +1,6 @@
 package com.example.ms_rutas.controller;
 
+import com.example.ms_rutas.model.TipoTramo;
 import com.example.ms_rutas.model.Tramo;
 import com.example.ms_rutas.service.TramoService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,11 @@ public class TramoController {
     @GetMapping
     public ResponseEntity<List<Tramo>> getTramos() {
         return ResponseEntity.ok(tramoService.obtenerTodasLosTramos());
+    }
+
+    @GetMapping("/{idTipoTramo}")
+    public ResponseEntity<Tramo> obtenerPorId(@PathVariable Integer idTipoTramo) {
+        return ResponseEntity.ok(tramoService.obtenerTramoPorId(idTipoTramo));
     }
 
     @PutMapping("/camion/{idTramo}")

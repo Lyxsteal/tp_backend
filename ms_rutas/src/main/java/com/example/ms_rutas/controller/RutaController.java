@@ -17,6 +17,7 @@ public class RutaController {
     public RutaController(RutaService rutaService) {
         this.rutaService = rutaService;
     }
+
     @GetMapping
     public ResponseEntity<List<Ruta>> getRutas() {
         return ResponseEntity.ok(rutaService.obtenerTodosLasRutas());
@@ -49,9 +50,9 @@ public class RutaController {
     }
 
     //delete
-    @DeleteMapping({"/id"})
-    public ResponseEntity<Void> eliminarRuta(@PathVariable Integer id) {
-        rutaService.eliminarRuta(id);
+    @DeleteMapping({"/{idRuta}"})
+    public ResponseEntity<Void> eliminarRuta(@PathVariable Integer idRuta) {
+        rutaService.eliminarRuta(idRuta);
         return ResponseEntity.noContent().build();
     }
 }

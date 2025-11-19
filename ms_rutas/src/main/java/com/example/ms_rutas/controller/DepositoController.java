@@ -1,6 +1,7 @@
 package com.example.ms_rutas.controller;
 
 
+import com.example.ms_rutas.model.Camionero;
 import com.example.ms_rutas.model.Deposito;
 import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
@@ -22,6 +23,10 @@ public class DepositoController {
         return depositoService.obtenerTodosLosDepositos();
     }
 
+    @GetMapping("/{cedula}")
+    public ResponseEntity<Deposito> obtenerDeposito(@PathVariable Integer idDeposito) {
+        return ResponseEntity.ok(depositoService.obtenerDepositoPorId(idDeposito));
+    }
     //put
     @PutMapping("/{idDeposito}")
     public ResponseEntity<Deposito> actualizardeposito(@PathVariable Integer idDeposito , @RequestBody Deposito deposito) {
@@ -34,7 +39,7 @@ public class DepositoController {
     }
 
     //delete
-    @DeleteMapping
+    @DeleteMapping("/{idDeposito}")
     public ResponseEntity<Void> eliminarDesposito(@PathVariable Integer idDeposito) {
             depositoService.eliminarDeposito(idDeposito);
        return ResponseEntity.noContent().build();

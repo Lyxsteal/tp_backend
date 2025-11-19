@@ -1,4 +1,4 @@
-package com.example.ms_solicitud.controller;
+/* package com.example.ms_solicitud.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,5 +20,5 @@ public class GlobalErrors {
         pd.setDetail(ex.getMessage());
         return pd;
     }
-}
+} */
 

@@ -3,6 +3,7 @@ package com.example.ms_rutas.controller;
 
 import com.example.ms_rutas.model.Camionero;
 import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.model.Ubicacion;
 import com.example.ms_rutas.service.CamioneroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,10 @@ import java.util.List;
 public class CamioneroController {
     private final CamioneroService camioneroService;
 
+    @GetMapping
+    public ResponseEntity<List<Camionero>> getCamioneros() {
+        return ResponseEntity.ok(camioneroService.obtenerTodosLosCamioneros());
+    }
     //get
     @GetMapping("/{cedula}")
     public ResponseEntity<Camionero> obtenerCamionero(@PathVariable Integer cedula) {
@@ -30,13 +35,13 @@ public class CamioneroController {
     }
 
     //put
-    @PutMapping
+    @PutMapping("/{cedula}")
     public ResponseEntity<Camionero> actualizarCamionero(@PathVariable Integer cedula, @RequestBody Camionero camionero) {
         return ResponseEntity.ok(camioneroService.actualizarCamionero(cedula, camionero));
     }
 
     //delete
-    @DeleteMapping
+    @DeleteMapping("/{cedula}")
     public ResponseEntity<Void> eliminarCamionero(@PathVariable Integer cedula) {
         camioneroService.eliminarCamionero(cedula);
         return ResponseEntity.noContent().build();

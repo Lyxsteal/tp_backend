@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,42 +21,56 @@ import java.util.List;
 public class RutaService {
     private final RutaRepository rutaRepository;
     private final DistanciaClient distanciaClient;
-
+    private static final Logger log = LoggerFactory.getLogger(RutaService.class);
 
     @Transactional(readOnly = true)
     public List<Ruta> obtenerTodosLasRutas() {
+        log.info("Obtenidas todas las rutas");
         return rutaRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Ruta obtenerRutaPorId(Integer id) {
         return rutaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrado con id: " + id));
+                .orElseThrow(() -> {
+                    log.warn("la ruta no existe con id:"+ id);
+                    return new RuntimeException("Ruta no encontrado con id: " + id);
+                });
     }
 
     @Transactional
     public Ruta crearRuta(Ruta ruta) {
+        if (rutaRepository.existsById(ruta.getIdRuta())){
+            log.warn("ya existe la Ruta con ID: " + ruta.getIdRuta());
+            throw new RuntimeException("ya existe la ruta");
+        };
+        log.info("creando ruta");
         return rutaRepository.save(ruta);
     }
 
     @Transactional
     public Ruta actualizarRuta(Integer id, Ruta rutaActualizada) {
         Ruta rutaExistente = obtenerRutaPorId(id);
+        rutaExistente.setTramos(rutaActualizada.getTramos());
+        rutaExistente.setCantidadTramos(rutaActualizada.getCantidadTramos());
+        rutaExistente.setCantidadDepositos(rutaActualizada.getCantidadDepositos());
+        log.info("Ruta actualizada");
         return rutaRepository.save(rutaExistente);
     }
 
     @Transactional
     public void eliminarRuta(Integer id) {
         if (!rutaRepository.existsById(id)) {
+            log.warn("No se puedo eliminar.La ruta no se encontro con id:"+id);
             throw new RuntimeException("No se puede eliminar. Ruta no encontrada con id: " + id);
         }
+        log.info("Ruta eliminada");
         rutaRepository.deleteById(id);
     }
 
     @Transactional
     public Ruta asignarTramosARuta(Integer idRuta, List<Tramo> tramos) {
-        Ruta ruta = rutaRepository.findById(idRuta)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+        Ruta ruta = obtenerRutaPorId(idRuta);
         ruta.setTramos(tramos);
         return rutaRepository.save(ruta);
     }
@@ -63,12 +78,11 @@ public class RutaService {
     @Transactional
 
     public CostoFinalDto obtenerCostos(Integer idruta) {
-        Ruta ruta = rutaRepository.findById(idruta)
-                .orElseThrow(() -> new RuntimeException("Ruta no encontrada"));
+        Ruta ruta = obtenerRutaPorId(idruta);
+        log.info("calculando el consumo de combustible");
         Double consumo = obtenerConsumoTotal(ruta.getTramos());
-        System.out.println(consumo);
+        log.info("calculando la cantidad de dias");
         Integer cantDias = ruta.obtenerDiasEstadia();
-        System.out.println(cantDias);
         CostoFinalDto costo = new CostoFinalDto();
         costo.setCantTramos(ruta.getTramos().size());
         costo.setConsumoTotalComb(consumo);
@@ -89,6 +103,7 @@ public class RutaService {
             consumoTotal += consumoCombustible;
 
         }
+        log.info("El consumo total es " + consumoTotal);
         return consumoTotal;
 
     }
@@ -101,8 +116,7 @@ public class RutaService {
 
         Double distancia = distanciaClient.obtenerDistancia(coordenadas);
 
-        System.out.println("distancia: " + distancia + " km");
-
+        log.info("Distancia calculada");
         return distancia;
 
     }

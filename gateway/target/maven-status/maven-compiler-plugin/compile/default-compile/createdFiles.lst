@@ -1,7 +1,0 @@
-backend\grupo130\gateway\config\exceptions\GlobalExceptionHandler.class
-backend\grupo130\gateway\config\SecurityConfig.class
-backend\grupo130\gateway\GatewayApplication.class
-backend\grupo130\gateway\beans\WebClientConfig.class
-backend\grupo130\gateway\config\exceptions\ServiceError.class
-backend\grupo130\gateway\beans\GatewayBeans.class
-backend\grupo130\gateway\controller\AuthController.class

@@ -21,13 +21,13 @@ public class Solicitud {
     @Column(name="ruta_id")
     private Integer idRuta;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name="contenedor_id")
     private Contenedor numeroContenedor;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="cliente_id")
-    private Cliente dniCliente;
+    private Cliente Cliente;
 
     @Column(name="costoEstimado")
     private float costoEstimado;

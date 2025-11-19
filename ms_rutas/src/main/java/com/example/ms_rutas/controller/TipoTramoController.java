@@ -28,7 +28,7 @@ public class TipoTramoController {
         return ResponseEntity.ok(tipoTramoService.obtenerTipoTramoPorId(idTipoTramo));
     }
     //put
-    @PutMapping("/{idTramo}")
+    @PutMapping("/{id}")
     public ResponseEntity<TipoTramo> actualizarTipoTramo(@PathVariable Integer id, @RequestBody TipoTramo tipoTramo) {
         return ResponseEntity.ok(tipoTramoService.actualizarTipoTramo(id, tipoTramo));
     }

@@ -50,9 +50,8 @@ public class SolicitudController {
     }
     //put
     @PutMapping("estados/{idSolicitud}")
-    public ResponseEntity<Solicitud> actualizarEstado(@PathVariable Integer idSolicitud, @RequestBody Solicitud solicitudActualizada){
-    service.actualizarEstado(idSolicitud, solicitudActualizada);
-    return ResponseEntity.ok(solicitudActualizada);
+    public ResponseEntity<Solicitud> actualizarEstado(@PathVariable Integer idSolicitud, @RequestBody String estado){
+    return ResponseEntity.ok(service.actualizarEstado(idSolicitud, estado));
     }
 
     @PutMapping("asignar-ruta/{idSolicitud}")

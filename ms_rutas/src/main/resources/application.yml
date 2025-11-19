@@ -17,5 +17,8 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
-springdoc:
-  swagger-ui.path: /swagger-ui.html
+logging:
+  level:
+    root: INFO
+    com.example.ms_rutas: DEBUG
+

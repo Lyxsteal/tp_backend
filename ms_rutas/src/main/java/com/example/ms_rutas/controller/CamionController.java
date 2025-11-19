@@ -56,7 +56,7 @@ public class CamionController {
     //get
     @GetMapping("/consumo-prom/{patente}")
     public ConsumoBaseResponse ObtenerConsumoBase(@PathVariable String patente) {
-        return camionService.obtenerConsumoBaseCamion(patente);
+        return camionService.obtenerConsumoPromedioCamion(patente);
     }
     //put
     @PutMapping("/{camion_patente}")

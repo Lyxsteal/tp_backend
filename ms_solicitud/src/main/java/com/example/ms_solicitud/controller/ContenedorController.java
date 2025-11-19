@@ -18,10 +18,10 @@ import java.util.List;
             this.contenedorService = contenedorService;
         }
 
-//        @GetMapping
-//        public ResponseEntity<List<Contenedor>> obtenerTodos() {
-//            return ResponseEntity.ok(contenedorService.);
-//        }
+        @GetMapping
+        public ResponseEntity<List<Contenedor>> obtenerTodos() {
+           return ResponseEntity.ok(contenedorService.obtenerTodosLosContenedores());
+      }
         //get
         @GetMapping("/{idContenedor}")
         public ResponseEntity<Contenedor> obtenerPorId(@PathVariable Integer idContenedor) {

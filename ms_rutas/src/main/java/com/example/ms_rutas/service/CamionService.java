@@ -12,6 +12,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.ms_rutas.repository.CamionRepository;
@@ -23,17 +25,22 @@ import java.util.List;
 public class CamionService {
     private final CamionRepository camionRepository;
     private final CamioneroRepository camioneroRepository;
+    private static final Logger log = LoggerFactory.getLogger(CamionService.class);
 
 
     @Transactional(readOnly = true)
     public List<Camion> obtenerTodasLosCamiones() {
+        log.info("Buscando todos los camiones");
         return camionRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Camion obtenerCamionPorPatente(String patente) {
         return camionRepository.findById(patente)
-                .orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
+                .orElseThrow(() -> {
+                    log.warn("No se pudo encontrar el camión con la patente " + patente);
+                    return new RuntimeException("Camión no encontrado con patente: " + patente);
+                });
     }
 
     @Transactional
@@ -41,7 +48,10 @@ public class CamionService {
         Integer cedula = camion.getCamionero().getCedulaCamionero();
 
         Camionero camioneroExistente = camioneroRepository.findById(cedula)
-                .orElseThrow(() -> new RuntimeException("Camionero no encontrado con cédula: " + cedula));
+                .orElseThrow(() -> {
+                    log.warn("No se pudo encontrar el camionero con cédula" + cedula);
+                    return new RuntimeException("Camionero no encontrado con cédula: " + cedula);
+                });
         if (obtenerCamionPorPatente(camion.getPatente()) != null) {
             throw new RuntimeException("Camión ya existe");
         }
@@ -100,7 +110,7 @@ public class CamionService {
     }
 
     @Transactional
-    public ConsumoBaseResponse obtenerConsumoBaseCamion(String patente){
+    public ConsumoBaseResponse obtenerConsumoPromedioCamion(String patente){
         Camion camion = camionRepository.findById(patente)
                 .orElseThrow(() -> new RuntimeException("Camión no encontrado con patente: " + patente));
         ConsumoBaseResponse consumoBaseResponse = new ConsumoBaseResponse();
