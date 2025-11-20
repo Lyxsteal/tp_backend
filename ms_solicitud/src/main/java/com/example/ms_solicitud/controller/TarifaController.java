@@ -18,7 +18,7 @@ public class TarifaController {
     public ResponseEntity<List<Tarifa>> obtenerTarifas() {
         return ResponseEntity.ok(service.obtenerTodasLasTarifas());
     }
-    @GetMapping("/{isTarifa}")
+    @GetMapping("/{idTarifa}")
     public  ResponseEntity<Tarifa> obtenerTarifaPorId(Integer idTarifa){
         return ResponseEntity.ok(service.obtenerTarifaPorId(idTarifa));
     }

@@ -36,11 +36,8 @@ public class UbicacionService {
 
     @Transactional
     public Ubicacion crearUbicacion(Ubicacion ubicacion) {
-        if (ubicacionRepository.existsById(ubicacion.getIdUbicacion())){
-            log.warn("la ubicacion ya existe");
-            throw new RuntimeException("la ubicacion con ID: "+ ubicacion.getIdUbicacion() + "ya existe");
-        }
         log.info("creando ubicacion");
+        ubicacion.setIdUbicacion(null);
         return ubicacionRepository.save(ubicacion);
     }
 
