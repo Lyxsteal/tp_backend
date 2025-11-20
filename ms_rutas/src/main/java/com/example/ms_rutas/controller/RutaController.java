@@ -3,6 +3,7 @@ package com.example.ms_rutas.controller;
 import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
 import com.example.ms_rutas.model.dto.CostoFinalDto;
+import com.example.ms_rutas.model.dto.RutaSugeridaDto;
 import com.example.ms_rutas.service.RutaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,11 @@ public class RutaController {
     public CostoFinalDto getCostos(@PathVariable String idRuta) {
         Integer numeroRuta = Integer.parseInt(idRuta);
         return rutaService.obtenerCostos(numeroRuta);
+    }
+    @PostMapping("/rutas-tentativas")
+    public List<RutaSugeridaDto> getRutasTentativas(@RequestBody List<Ruta> rutas) {
+        return rutaService.consultarRutasTentativas(rutas);
+
     }
     //put
     @PutMapping({"/{idRuta}"})

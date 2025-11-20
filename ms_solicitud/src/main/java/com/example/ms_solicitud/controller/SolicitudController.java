@@ -2,6 +2,7 @@ package com.example.ms_solicitud.controller;
 
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
+import com.example.ms_solicitud.model.dto.SolicitudDto;
 import com.example.ms_solicitud.security.AuthenticatedUser;
 import com.example.ms_solicitud.security.UserHeaderInterceptor;
 import com.example.ms_solicitud.service.ContenedorService;
@@ -64,8 +65,8 @@ public class SolicitudController {
     }
     //post
     @PostMapping
-    public ResponseEntity<Solicitud> crearSolicitud (@RequestBody Solicitud solicitud){
-        service.crearSolicitud(solicitud);
+    public ResponseEntity<Solicitud> crearSolicitud (@RequestBody SolicitudDto solicitudDto){
+        Solicitud solicitud =service.crearSolicitud(solicitudDto);
         return ResponseEntity.ok(solicitud);
     }
 

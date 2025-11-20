@@ -23,7 +23,7 @@ public class Solicitud {
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name="contenedor_id")
-    private Contenedor numeroContenedor;
+    private Contenedor Contenedor;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="cliente_id")

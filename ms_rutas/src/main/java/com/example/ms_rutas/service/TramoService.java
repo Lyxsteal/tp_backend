@@ -1,6 +1,7 @@
 package com.example.ms_rutas.service;
 
 import com.example.ms_rutas.model.*;
+import com.example.ms_rutas.model.dto.TramoDto;
 import com.example.ms_rutas.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -38,24 +39,16 @@ public class TramoService {
     }
 
     @Transactional
-    public Tramo crearTramo(Tramo tramo) {
-        Ruta ruta = rutaRepository.findById(tramo.getRuta().getIdRuta())
-                .orElseThrow(() -> {
-                        log.warn("no se encontro la ruta con ID:" + tramo.getRuta().getIdRuta());
-                        return new RuntimeException("Ruta no encontrada");
-
-                });
-        tramo.setRuta(ruta);
-
-        // 2. Cargar Ubicaciones
-        Ubicacion origen = ubicacionRepository.findById(tramo.getUbicacionOrigen().getIdUbicacion())
+    public Tramo crearTramo(TramoDto tramoDto) {
+        Tramo tramo = new Tramo();
+        Ubicacion origen = ubicacionRepository.findById(tramoDto.getUbicacionOrigenId())
                 .orElseThrow(() ->{
                     log.warn("Ubicacion de origen no encontrada");
                     return new RuntimeException("Ubicación Origen no encontrada");});
         log.info("Ubicacion de origen encontrada");
         tramo.setUbicacionOrigen(origen);
 
-        Ubicacion destino = ubicacionRepository.findById(tramo.getUbicacionDestino().getIdUbicacion())
+        Ubicacion destino = ubicacionRepository.findById(tramoDto.getUbicacionDestinoId())
                 .orElseThrow(() -> {
                     log.warn("no se encontro la ubicacion de destino");
                     return new RuntimeException("Ubicación Destino no encontrada");
@@ -64,13 +57,14 @@ public class TramoService {
         tramo.setUbicacionDestino(destino);
 
         // 3. Cargar TipoTramo
-        TipoTramo tipo = tipoTramoRepository.findById(tramo.getTipoTramo().getIdTipoTramo())
+        TipoTramo tipo = tipoTramoRepository.findById(tramoDto.getTipoTramo())
                 .orElseThrow(() -> {
                     log.warn("Tipo de tramo No encontrado");
                     return new RuntimeException("Tipo de Tramo no encontrado");
                 });
         log.info("tipo de tramo encontrado");
         tramo.setTipoTramo(tipo);
+        tramo.setEstadoTramo(tramoDto.getEstadoTramo());
         log.info("creando tramo");
         return tramoRepository.save(tramo);
     }

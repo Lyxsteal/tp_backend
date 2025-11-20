@@ -25,6 +25,6 @@ public class Camionero {
     private String apellido;
 
     @Column(name="telefono")
-    private Integer telefono;
+    private String telefono;
 
 }

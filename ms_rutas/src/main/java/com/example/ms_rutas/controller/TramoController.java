@@ -2,6 +2,7 @@ package com.example.ms_rutas.controller;
 
 import com.example.ms_rutas.model.TipoTramo;
 import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.model.dto.TramoDto;
 import com.example.ms_rutas.service.TramoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class TramoController {
 
     //post
     @PostMapping
-    public ResponseEntity<Tramo> crearTramo(@RequestBody Tramo tramo) {
+    public ResponseEntity<Tramo> crearTramo(@RequestBody TramoDto tramo) {
         return ResponseEntity.ok(tramoService.crearTramo(tramo));
     }
 

@@ -4,6 +4,8 @@ import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
 import com.example.ms_rutas.model.Ubicacion;
 import com.example.ms_rutas.model.dto.CostoFinalDto;
+import com.example.ms_rutas.model.dto.OsrmRouteDto;
+import com.example.ms_rutas.model.dto.RutaSugeridaDto;
 import com.example.ms_rutas.repository.RutaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -119,5 +122,31 @@ public class RutaService {
         log.info("Distancia calculada");
         return distancia;
 
+    }
+
+    public List<RutaSugeridaDto> consultarRutasTentativas(List<Ruta> rutas){
+        List<RutaSugeridaDto> rutaSugeridas = new ArrayList<>();
+        log.info("calculando distancia de rutas tentativas");
+        for (Ruta ruta : rutas) {
+           Double distanciaTotal = 0.0;
+           Double DuracionTotal = 0.0;
+           for (Tramo tramo : ruta.getTramos()) {
+               Ubicacion origen = tramo.getUbicacionOrigen();
+               Ubicacion destino = tramo.getUbicacionDestino();
+               String coordenadas = origen.getLongitud() + "," + origen.getLatitud() + ";"
+                       + destino.getLongitud() + "," + destino.getLatitud();
+               OsrmRouteDto resultados = distanciaClient.obtenerTiempoYDistancia(coordenadas);
+               distanciaTotal += resultados.getDistance();
+               DuracionTotal += resultados.getDuration();
+           }
+           RutaSugeridaDto rutaSugerida = new RutaSugeridaDto();
+           rutaSugerida.setDistancia(distanciaTotal);
+           rutaSugerida.setDuracion(DuracionTotal);
+           rutaSugerida.setRuta(ruta);
+           rutaSugerida.setCantidadTramos(ruta.getTramos().size());
+           rutaSugeridas.add(rutaSugerida);
+        };
+        log.info("devolviendo rutas tentativas");
+        return rutaSugeridas;
     }
 }

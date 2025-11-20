@@ -20,7 +20,7 @@ public class Cliente {
     private String apellido;
 
     @Column(name="telefono")
-    private Integer telefono;
+    private String telefono;
 
     @Column(name="mail")
     private String mail;

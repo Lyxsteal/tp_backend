@@ -27,7 +27,4 @@ public class Ubicacion {
     @Column(name = "longitud")
     private Float longitud;
 
-    @JoinColumn(name = "id_tramo")
-    @OneToOne(fetch =  FetchType.EAGER)
-    Tramo tramo;
 }

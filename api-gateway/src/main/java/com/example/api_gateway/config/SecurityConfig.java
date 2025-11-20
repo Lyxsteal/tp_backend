@@ -29,14 +29,13 @@ public class SecurityConfig {
                 .authorizeExchange(ex -> ex
 
                         // --- 1. RUTAS PÚBLICAS Y DE LOGIN ---
-                        // (Asumo que inicio-sesion es público o lo maneja el login)
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/inicio-sesion").permitAll()
                         // (Rutas de callback de Keycloak)
                         .pathMatchers("/oauth2/**", "/login/**").permitAll()
                         .pathMatchers("/gateway/whoami").authenticated() // Tu endpoint de prueba
 
                         // --- 2. RUTAS DE TRANSPORTISTA (Las más específicas) ---
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/asignados/**").hasRole("TRANSPORTISTA")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/tramos-asignados/**").hasRole("TRANSPORTISTA")
 
                         // --- 3. RUTAS DE CLIENTE ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/clientes").hasRole("CLIENTE")
@@ -48,7 +47,6 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/{id}").hasRole("CLIENTE")
 
                         // --- 4. RUTAS DE ADMIN (Específicas de Solicitud) ---
-                        // (Estas deben ir ANTES que la regla general de CLIENTE /api/v1/solicitudes/*)
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/contenedores/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/estados/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/contenedores/estado/**").hasRole("ADMIN")
@@ -69,15 +67,14 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/camiones-aptos").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/costobase/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/consumo-prom/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/ciudades").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/ciudades").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/ciudades/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/ciudades").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/ciudades").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/ciudades/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/usuarios/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/*").hasRole("ADMIN")
 
                         // --- 6. RUTAS COMPARTIDAS (ADMIN + TRANSPORTISTA) ---
-                        // (Tu lista tiene PUT /api/v1/rutas/tramos/* para ambos roles)
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/*").hasAnyRole("ADMIN", "TRANSPORTISTA")
 
                         // --- 7. RUTAS GENERALES DE CLIENTE (Al final) ---

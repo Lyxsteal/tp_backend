@@ -2,10 +2,7 @@ package com.example.ms_rutas.controller;
 
 import com.example.ms_rutas.model.Camion;
 import com.example.ms_rutas.model.Deposito;
-import com.example.ms_rutas.model.dto.CapacidadRequest;
-import com.example.ms_rutas.model.dto.CapacidadResponse;
-import com.example.ms_rutas.model.dto.ConsumoBaseResponse;
-import com.example.ms_rutas.model.dto.CostoTrasladoResponse;
+import com.example.ms_rutas.model.dto.*;
 import com.example.ms_rutas.service.CamionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -65,9 +62,9 @@ public class CamionController {
     }
     //post
     @PostMapping
-    public ResponseEntity<Camion> crearCamion(@RequestBody Camion camion){
+    public ResponseEntity<Camion> crearCamion(@RequestBody CamionDto camion){
         return ResponseEntity.ok(camionService.crearCamion(camion));
-    } //revisar tema patente, deberia pasarle patente
+    }
 
     //delete
     @DeleteMapping("/{camion_patente}")

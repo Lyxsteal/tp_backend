@@ -12,10 +12,13 @@ import java.util.List;
 @Service
 public class ClienteService {
     private final ClienteRepository clienteRepository;
+
     private static final Logger log = LoggerFactory.getLogger(ClienteService.class);
+
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
     }
+
     @Transactional
     public List<Cliente> obtenerTodosLosClientes() {
         log.info("Buscando todos los clientes");

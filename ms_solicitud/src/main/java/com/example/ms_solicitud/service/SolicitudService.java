@@ -5,6 +5,7 @@ import com.example.ms_solicitud.model.Contenedor;
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
 import com.example.ms_solicitud.model.dto.CostoFinalDto;
+import com.example.ms_solicitud.model.dto.SolicitudDto;
 import com.example.ms_solicitud.repository.ClienteRepository;
 import com.example.ms_solicitud.repository.ContenedorRepository;
 import com.example.ms_solicitud.repository.SolicitudRepository;
@@ -41,21 +42,24 @@ public class SolicitudService {
     }
 
     @Transactional
-    public Solicitud crearSolicitud(Solicitud solicitud) {
-        if (solicitudRepository.existsById(solicitud.getNumero())) {
-            log.warn("ya existe la solicitud");
-            throw new RuntimeException("Ya existe una solicitud con el numero: " + solicitud.getNumero());
-        }
+    public Solicitud crearSolicitud(SolicitudDto solicitudDto) {
+        Solicitud solicitud = new Solicitud();
+        Cliente cliente = solicitudDto.getCliente();
         //ver si existe el cliente
-        log.info("buscando cliente con ID:" + solicitud.getCliente().getDni());
-        if (!clienteRepository.existsById(solicitud.getCliente().getDni())) {
+        log.info("buscando cliente con ID:" + solicitudDto.getCliente().getDni());
+        if (!clienteRepository.existsById(solicitudDto.getCliente().getDni())) {
             log.info("cliente no encontrado, creando uno nuevo");
-            Cliente cliente = clienteRepository.save(solicitud.getCliente());
+            cliente = clienteRepository.save(solicitudDto.getCliente());
+
             log.info("Cliente creado");
         }
+        solicitud.setCliente(cliente);
         //crea el contenedor
         log.info("creando contenedor");
-        Contenedor contenedor = contenedorRepository.save(solicitud.getNumeroContenedor());
+        Contenedor contenedor = contenedorRepository.save(solicitudDto.getContenedor());
+        solicitud.setContenedor(contenedor);
+        solicitud.setCoordenadasOrigen(solicitudDto.getCoordenadasOrigen());
+        solicitud.setCoordenadasDestino(solicitudDto.getCoordenadasDestino());
         log.info("creando solicitud");
         return solicitudRepository.save(solicitud);
     }
@@ -71,7 +75,7 @@ public class SolicitudService {
         solicitudExistente.setTiempoReal(solicitudActualizada.getTiempoReal());
         solicitudExistente.setConsumoEstimado(solicitudActualizada.getConsumoEstimado());
         solicitudExistente.setCostoFinal(solicitudActualizada.getCostoFinal());
-        solicitudExistente.setNumeroContenedor(solicitudActualizada.getNumeroContenedor());
+        solicitudExistente.setContenedor(solicitudActualizada.getContenedor());
         solicitudExistente.setCliente(solicitudActualizada.getCliente());
         solicitudExistente.setIdTarifa(solicitudActualizada.getIdTarifa());
         solicitudExistente.setCoordenadasOrigen(solicitudActualizada.getCoordenadasOrigen());
@@ -104,7 +108,7 @@ public class SolicitudService {
                     log.warn("solicitud con ID: "+ idSolicitud + "no encontrada");
                     return new RuntimeException("no se encontro la solicitud");
                 });
-        solicitud.getNumeroContenedor().setEstado(estado);
+        solicitud.getContenedor().setEstado(estado);
         log.info("Actualizando estado de solicitud " + idSolicitud + " a " + estado);
         return solicitudRepository.save(solicitud);
     }
@@ -140,7 +144,7 @@ public class SolicitudService {
         log.info("obteniendo los costos");
         CostoFinalDto costo = rutasClient.getCostos(idRuta);
 
-        Double costoFinalCalculado = solicitud.getIdTarifa().calcularCostos(costo,solicitud.getNumeroContenedor().getVolumen()) ;
+        Double costoFinalCalculado = solicitud.getIdTarifa().calcularCostos(costo,solicitud.getContenedor().getVolumen()) ;
         log.info("costo final calculado");
 
         return costoFinalCalculado;
