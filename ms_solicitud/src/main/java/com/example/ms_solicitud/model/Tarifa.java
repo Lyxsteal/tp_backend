@@ -15,7 +15,7 @@ public class Tarifa {
     @Id
     @Column(name="idTarifa")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idTarifa;
+    private Integer idTarifa;
 
     @Column(name="valorFijoTramo")
     private Double valorFijoTramo;

@@ -16,7 +16,7 @@ public class Solicitud {
     @Id
     @Column(name="numero")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int numero;
+    private Integer numero;
 
     @Column(name="ruta_id")
     private Integer idRuta;

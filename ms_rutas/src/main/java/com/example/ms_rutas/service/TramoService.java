@@ -104,9 +104,10 @@ public class TramoService {
     }
 
     public Tramo asignarCamionATramo(Integer idTramo,String camionPatente) {
-        Camion camion = camionRepository.findById(camionPatente)
+        String patenteLimpia = camionPatente.trim().replace("\"", "");
+        Camion camion = camionRepository.findById(patenteLimpia)
                 .orElseThrow(() ->{
-                    log.warn("Camion no encontrado con ID"+camionPatente);
+                    log.warn("Camion no encontrado con ID"+ camionPatente);
                     return new RuntimeException("Camion no encontrado con ID: " + camionPatente)
                 ;});
         camion.setDisponibilidad(false);

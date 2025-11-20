@@ -37,10 +37,7 @@ public class TarifaService {
     @Transactional
     public Tarifa crearTarifa(Tarifa tarifa) {
         // Aquí podrías agregar lógica de validación
-        if(tarifaRepository.existsById(tarifa.getIdTarifa())) {
-            log.warn("la tarifa ya existe");
-            throw new RuntimeException("tarifa con ID; " + tarifa.getIdTarifa() + "ya existe");
-        }
+        tarifa.setIdTarifa(null);
         log.info("creando tarifa");
         return tarifaRepository.save(tarifa);
     }

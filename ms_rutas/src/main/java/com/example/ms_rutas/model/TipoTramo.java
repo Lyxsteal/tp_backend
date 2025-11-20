@@ -13,6 +13,7 @@ import java.util.UUID;
 public class TipoTramo {
     @Id
     @Column(name = "idTipoTramo")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idTipoTramo;
 
     @Column(name = "nombre_tipo")

@@ -35,6 +35,7 @@ public class TipoTramoService {
 
     @Transactional
     public TipoTramo crearTipoTramo(TipoTramo tipoTramo) {
+        tipoTramo.setIdTipoTramo(null);
         log.info("Creando nuevo tipo de tramo...");
         return tipoTramoRepository.save(tipoTramo);
     }

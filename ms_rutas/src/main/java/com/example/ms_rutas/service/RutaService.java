@@ -43,10 +43,7 @@ public class RutaService {
 
     @Transactional
     public Ruta crearRuta(Ruta ruta) {
-        if (rutaRepository.existsById(ruta.getIdRuta())){
-            log.warn("ya existe la Ruta con ID: " + ruta.getIdRuta());
-            throw new RuntimeException("ya existe la ruta");
-        };
+        ruta.setIdRuta(null);
         log.info("creando ruta");
         return rutaRepository.save(ruta);
     }
@@ -74,6 +71,9 @@ public class RutaService {
     @Transactional
     public Ruta asignarTramosARuta(Integer idRuta, List<Tramo> tramos) {
         Ruta ruta = obtenerRutaPorId(idRuta);
+        for(Tramo tramo: tramos){
+            tramo.setRuta(ruta);
+        }
         ruta.setTramos(tramos);
         return rutaRepository.save(ruta);
     }

@@ -11,7 +11,7 @@ import lombok.*;
 public class Contenedor {
     @Id
     @Column(name="id_contenedor")
-    private int idContenedor;
+    private Integer idContenedor;
 
     @Column(name="peso")
     private Double peso;

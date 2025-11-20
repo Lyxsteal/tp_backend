@@ -1,4 +1,5 @@
 package com.example.ms_rutas.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,11 +18,12 @@ public class Tramo {
     @Id
     @Column(name="idTramo")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idTramo;
+    private Integer idTramo;
 
 
     @JoinColumn(name="idRuta")
     @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private Ruta ruta;
 
     @Column(name="nro_orden")

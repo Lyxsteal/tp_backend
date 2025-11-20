@@ -27,7 +27,7 @@ public class TramoController {
     }
 
     @PutMapping("/camion/{idTramo}")
-    public ResponseEntity<Tramo> AsignarCamionATramo(@PathVariable Integer idTramo, @RequestBody String camion_patente ) {
+    public ResponseEntity<Tramo> AsignarCamionATramo(@PathVariable Integer idTramo, @RequestBody String camion_patente) {
         return ResponseEntity.ok(tramoService.asignarCamionATramo(idTramo,camion_patente));
 
     }

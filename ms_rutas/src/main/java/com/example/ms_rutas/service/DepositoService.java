@@ -37,12 +37,8 @@ public class DepositoService {
 
         @Transactional
         public Deposito crearDeposito(Deposito deposito) {
-        if (depositoRepository.existsById(deposito.getId())) {
-            log.warn("ya existe el contenedor");
-            throw new RuntimeException("el contenedor ya existe");
-        }
+        deposito.setId(null);
         return depositoRepository.save(deposito);
-
         }
 
         @Transactional

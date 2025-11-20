@@ -27,8 +27,7 @@ public class Ruta {
     @Column(name="cantidadDepositos")
     private Integer cantidadDepositos;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "ruta")
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.MERGE)
     private List<Tramo> tramos;
 
     public Integer obtenerDiasEstadia(){
