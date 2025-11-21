@@ -61,7 +61,6 @@ public class CamionService {
         camion.setCapacidadPeso(camionDto.getCapacidadPeso());
         camion.setCapacidadVolumen(camionDto.getCapacidadVolumen());
         camion.setConsCombKm(camionDto.getConsCombKm());
-        camion.setCostoBaseTraslado(camionDto.getCostoBaseTranslado());
         camion.setDisponibilidad(true);
         log.info("creando camion");
         return camionRepository.save(camion);
@@ -108,19 +107,6 @@ public class CamionService {
         else{
             return camionesAptos;
             }
-    }
-    @Transactional
-    public CostoTrasladoResponse obtenerCostoBaseCamion(String patente){
-         Camion camion= camionRepository.findById(patente)
-                 .orElseThrow(() -> {
-                     log.warn("No se pudo encontrar el camión con la patente " + patente);
-                     return new RuntimeException("Camión no encontrado con patente: " + patente);
-                 });
-         CostoTrasladoResponse costoTrasladoResponse = new CostoTrasladoResponse();
-         costoTrasladoResponse.setPatente(camion.getPatente());
-         costoTrasladoResponse.setCostoBaseTraslado(camion.getCostoBaseTraslado());
-         return costoTrasladoResponse;
-
     }
 
     @Transactional

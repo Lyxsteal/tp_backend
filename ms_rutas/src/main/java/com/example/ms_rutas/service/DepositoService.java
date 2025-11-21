@@ -2,6 +2,7 @@ package com.example.ms_rutas.service;
 
 import com.example.ms_rutas.model.Camionero;
 import com.example.ms_rutas.model.Deposito;
+import com.example.ms_rutas.model.dto.DepositoDto;
 import com.example.ms_rutas.repository.CamioneroRepository;
 import com.example.ms_rutas.repository.DepositoRepository;
 import org.springframework.stereotype.Service;
@@ -36,8 +37,12 @@ public class DepositoService {
         }
 
         @Transactional
-        public Deposito crearDeposito(Deposito deposito) {
-        deposito.setId(null);
+        public Deposito crearDeposito(DepositoDto depositoDto) {
+        Deposito deposito = new Deposito();
+        deposito.setCoordenadas(depositoDto.getCoordenadas());
+        deposito.setDireccion(depositoDto.getDireccion());
+        deposito.setNombre(depositoDto.getNombre());
+        log.info("Deposito creado con exito");
         return depositoRepository.save(deposito);
         }
 
@@ -46,9 +51,9 @@ public class DepositoService {
             Deposito depositoExistente = obtenerDepositoPorId(id);
             depositoExistente.setDireccion(depositoActualizado.getDireccion());
             depositoExistente.setNombre(depositoActualizado.getNombre());
-            depositoExistente.setUbicacion(depositoActualizado.getUbicacion());
+            depositoExistente.setCoordenadas(depositoActualizado.getCoordenadas());
 
-            log.info("actualizando deposito");
+            log.info("Actualizando deposito");
             return depositoRepository.save(depositoExistente);
         }
 
@@ -58,7 +63,7 @@ public class DepositoService {
                 log.warn("No se puedo eliminar deposito.No fue encontrado");
                 throw new RuntimeException("No se puede eliminar. Depósito no encontrado con id: " + id);
             }
-            log.info("eliminando deposito con ID: " + id);
+            log.info("Eliminando deposito con ID: " + id);
             depositoRepository.deleteById(id);
         }
     }

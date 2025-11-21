@@ -12,4 +12,9 @@ public interface TramoRepository extends JpaRepository<Tramo, Integer> {
     @Query(value = "SELECT t FROM Tramo t WHERE t.camion.camionero.cedulaCamionero = :cedula")
     List<Tramo> encontrarTramosCamionero(
             @Param("cedula") Integer cedula);
+    @Query(value = "SELECT t FROM Tramo t WHERE t.nroOrden = :nroOrden AND t.ruta.idRuta = :idRuta")
+    Tramo encontrarTramoPorNroOrden(
+            @Param("nroOrden") Integer nroOrden,
+            @Param("idRuta") Integer idRuta
+    );
 }

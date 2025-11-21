@@ -46,11 +46,6 @@ public class CamionController {
         return ResponseEntity.ok(camionService.obtenerCamionesAptos(capacidadRequest));
     }
     //get
-    @GetMapping("/costo-base/{patente}")
-    public CostoTrasladoResponse ObtenerCostoBaseDelCamion(@PathVariable String patente) {
-        return camionService.obtenerCostoBaseCamion(patente);
-    }
-    //get
     @GetMapping("/consumo-prom/{patente}")
     public ConsumoBaseResponse ObtenerConsumoBase(@PathVariable String patente) {
         return camionService.obtenerConsumoPromedioCamion(patente);

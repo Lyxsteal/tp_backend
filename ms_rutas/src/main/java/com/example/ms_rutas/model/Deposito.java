@@ -19,9 +19,8 @@ public class Deposito {
     @Column(name = "direccion")
     private String direccion;
 
-    @JoinColumn(name = "id_ubicacion")
-    @OneToOne(fetch =  FetchType.EAGER, cascade = CascadeType.ALL)
-    Ubicacion ubicacion;
+    @Column(name = "coordenadas")
+    private String coordenadas;
 
 }
 /*identificacion | PK

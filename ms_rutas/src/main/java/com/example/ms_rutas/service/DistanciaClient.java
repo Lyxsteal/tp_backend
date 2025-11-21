@@ -15,7 +15,7 @@ public class DistanciaClient {
     private static final Logger log = LoggerFactory.getLogger(DistanciaClient.class);
 
     public Double obtenerDistancia(String cooredenadas) {
-        log.info("obteniendo distancia: ");
+        log.info("Obteniendo distancia: ");
         String url = "http://osrm:5000/route/v1/driving/" + cooredenadas;
         return restTemplate.getForObject(url, OsrmResponseDto.class).getRoutes().get(0).getDistance();
     }

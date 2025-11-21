@@ -36,13 +36,6 @@ public class TramoController {
         return tramoService.obtenerTramosPorCamionero(cedula);
     }
 
-
-    //put
-    @PutMapping("/estado/{idTramo}")
-    public ResponseEntity<Tramo> ActualizarEstadoTramo(@PathVariable Integer idTramo,@RequestBody String estadotramo) {
-        return ResponseEntity.ok(tramoService.actualizarEstadoTramo(idTramo,estadotramo));
-    }
-
     //put
     @PutMapping("/{idTramo}")
     public ResponseEntity<Tramo> actualizarTramo(@PathVariable Integer id, @RequestBody Tramo tramo) {
@@ -61,4 +54,16 @@ public class TramoController {
         tramoService.eliminarTramo(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/iniciar-tramo/{idTramo}")
+    public ResponseEntity<Tramo> iniciarTramo(@PathVariable Integer idTramo, @RequestBody Integer idSolicitud){
+        return ResponseEntity.ok(tramoService.iniciarTramo(idTramo));
+    }
+
+    //put
+    @PutMapping("/finalizar-tramo/{idTramo}")
+    public ResponseEntity<Tramo> finalizarTramo(@PathVariable Integer idTramo, @RequestBody Integer idSolicitud) {
+        return ResponseEntity.ok(tramoService.finalizarTramo(idTramo));
+    }
+
 }

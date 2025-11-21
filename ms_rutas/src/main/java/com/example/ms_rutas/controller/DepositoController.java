@@ -5,6 +5,7 @@ import com.example.ms_rutas.model.Camionero;
 import com.example.ms_rutas.model.Deposito;
 import com.example.ms_rutas.model.Ruta;
 import com.example.ms_rutas.model.Tramo;
+import com.example.ms_rutas.model.dto.DepositoDto;
 import com.example.ms_rutas.service.DepositoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,8 @@ public class DepositoController {
     }
     //post
     @PostMapping()
-    public ResponseEntity<Deposito> crearDeposito(@RequestBody Deposito deposito){
-        return ResponseEntity.ok(depositoService.crearDeposito(deposito));
+    public ResponseEntity<Deposito> crearDeposito(@RequestBody DepositoDto depositoDto){
+        return ResponseEntity.ok(depositoService.crearDeposito(depositoDto));
     }
 
     //delete

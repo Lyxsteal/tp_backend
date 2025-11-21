@@ -18,19 +18,15 @@ public class Camion {
     private Camionero camionero;
 
     @Column(name="capacidad_peso")
-    private Integer capacidadPeso;
+    private Double capacidadPeso;
 
     @Column(name="capacidad_volumen")
-    private Integer capacidadVolumen;
+    private Double capacidadVolumen;
 
     @Column(name="disponibilidad")
     private Boolean disponibilidad;
 
-    @Column(name="costo_base_traslado")
-    private Float costoBaseTraslado;
-
     @Column(name = "cons_comb_km")
     private Float consCombKm;
-
 
 }

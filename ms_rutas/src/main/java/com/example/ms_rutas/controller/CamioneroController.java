@@ -2,8 +2,6 @@ package com.example.ms_rutas.controller;
 
 
 import com.example.ms_rutas.model.Camionero;
-import com.example.ms_rutas.model.Tramo;
-import com.example.ms_rutas.model.Ubicacion;
 import com.example.ms_rutas.service.CamioneroService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

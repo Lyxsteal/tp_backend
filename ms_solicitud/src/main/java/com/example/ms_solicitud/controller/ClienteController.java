@@ -27,20 +27,24 @@ public class ClienteController {
     public ResponseEntity<Cliente> obtenerClientePorDni(@PathVariable Integer dni) {
         return ResponseEntity.ok(service.obtenerClientePorDni(dni));
     }
+
     @PostMapping
     public ResponseEntity<Cliente> crearCliente (@RequestBody Cliente cliente){
         service.crearCliente(cliente);
         return ResponseEntity.ok(cliente);
     }
+
     @PutMapping("/{dni}")
     public ResponseEntity<Cliente> actualizarCliente(@PathVariable Integer dni, @RequestBody Cliente cliente) {
         Cliente actualizado = service.actualizarCliente(dni, cliente);
         return ResponseEntity.ok(actualizado);
     }
+
     //delete
     @DeleteMapping("/{dni}")
-    public ResponseEntity<Void> eliminarContenedor(@PathVariable Integer dni) {
+    public ResponseEntity<Void> eliminarCliente(@PathVariable Integer dni) {
         service.eliminarCliente(dni);
         return ResponseEntity.noContent().build();
     }
 }
+

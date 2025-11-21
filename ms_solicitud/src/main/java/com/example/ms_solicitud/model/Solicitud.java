@@ -1,8 +1,11 @@
 package com.example.ms_solicitud.model;
 
+import com.example.ms_solicitud.model.cambioEstado.CambioEstado;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,31 +33,34 @@ public class Solicitud {
     private Cliente Cliente;
 
     @Column(name="costoEstimado")
-    private float costoEstimado;
-
+    private Double costoEstimado;
 
     @Column(name="tiempoEstimado")
-    private float tiempoEstimado;
-
+    private Double tiempoEstimado;
 
     @Column(name="costoFinal")
-    private float costoFinal;
-
+    private Double costoFinal;
 
     @Column(name="tiempoReal")
-    private float tiempoReal;
+    private Double tiempoReal;
 
-    @Column(name="consumoEstimado")
-    private float consumoEstimado;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="tarifa_id")
     private Tarifa idTarifa;
 
-
     @Column(name="coordenadasOrigen")
-    private double coordenadasOrigen;
+    private String coordenadasOrigen;
     
     @Column(name="coordenadarDestino")
-    private double coordenadasDestino;
+    private String coordenadasDestino;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado")
+    private EstadoSolicitud estadoActual;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL , mappedBy = "solicitud")
+    private List<CambioEstado>  cambioEstado;
+
+
 }

@@ -6,8 +6,8 @@ import lombok.Getter;
 public class CamionDto {
     private String patente;
     private Integer idCamionero;
-    private Integer capacidadPeso;
-    private Integer capacidadVolumen;
+    private Double capacidadPeso;
+    private Double capacidadVolumen;
     private Float costoBaseTranslado;
     private Float consCombKm;
 }

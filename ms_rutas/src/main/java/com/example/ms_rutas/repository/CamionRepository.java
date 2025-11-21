@@ -12,4 +12,9 @@ public interface CamionRepository extends JpaRepository<Camion, String> {
     List<Camion> encontrarDisponibles(
             @Param("pesoContenedor") Double pesoContenedor,
             @Param("volumenContenedor") Double volumenContenedor);
+
+    @Query(value = "SELECT AVG(c.consCombKm) FROM Camion c WHERE c.capacidadVolumen >= :volumenContenedor AND c.capacidadPeso >= :pesoContenedor ")
+    Double promedioConsumo(
+            @Param("volumenContenedor") Double volumenContenedor,
+            @Param("pesoContenedor") Double pesoContenedor);
 }

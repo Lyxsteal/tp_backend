@@ -1,12 +1,14 @@
 package com.example.ms_rutas.service;
 
+import com.example.ms_rutas.model.Deposito;
 import com.example.ms_rutas.model.Ruta;
+import com.example.ms_rutas.model.TipoTramo;
 import com.example.ms_rutas.model.Tramo;
-import com.example.ms_rutas.model.Ubicacion;
-import com.example.ms_rutas.model.dto.CostoFinalDto;
-import com.example.ms_rutas.model.dto.OsrmRouteDto;
-import com.example.ms_rutas.model.dto.RutaSugeridaDto;
+import com.example.ms_rutas.model.dto.*;
+import com.example.ms_rutas.repository.CamionRepository;
+import com.example.ms_rutas.repository.DepositoRepository;
 import com.example.ms_rutas.repository.RutaRepository;
+import com.example.ms_rutas.repository.TramoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +26,12 @@ import java.util.List;
 public class RutaService {
     private final RutaRepository rutaRepository;
     private final DistanciaClient distanciaClient;
+    private final  SolicitudClient solicitudClient;
+    private final DepositoRepository depositoRepository;
+    private final CamionRepository camionRepository;
+
     private static final Logger log = LoggerFactory.getLogger(RutaService.class);
+
 
     @Transactional(readOnly = true)
     public List<Ruta> obtenerTodosLasRutas() {
@@ -36,24 +43,52 @@ public class RutaService {
     public Ruta obtenerRutaPorId(Integer id) {
         return rutaRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("la ruta no existe con id:"+ id);
+                    log.warn("La ruta no existe con id: "+ id);
                     return new RuntimeException("Ruta no encontrado con id: " + id);
                 });
     }
 
     @Transactional
-    public Ruta crearRuta(Ruta ruta) {
-        ruta.setIdRuta(null);
-        log.info("creando ruta");
-        return rutaRepository.save(ruta);
+    public Integer crearRuta(RutaSugeridaDto rutaSugeridaDto,String coordenadasOrigen , String coordenadasDestino, Integer idSolicitud) {
+        Ruta ruta = new Ruta();
+
+
+        List<Tramo> tramosEntidad = new ArrayList<>();
+
+        for (TramoSugeridoDto tramoDto : rutaSugeridaDto.getTramos()) {
+            Tramo tramo = new Tramo();
+            tramo.setNroOrden(tramoDto.getNroOrden());
+            tramo.setCoordenadasOrigen(tramoDto.getCordenadasOrigen());
+            tramo.setCoordenadasDestino(tramoDto.getCordenadasDestino());
+            tramo.setEstadoTramo("PENDIENTE");
+            String tipotramoStr = "";
+            if (tramo.getCoordenadasOrigen().equals(coordenadasOrigen)){
+                tipotramoStr = "ORIGEN";
+            }
+            else {
+                tipotramoStr = "DEPOSITO";
+            }
+            if (tramo.getCoordenadasDestino().equals(coordenadasDestino)){
+                tipotramoStr = tipotramoStr + "_DESTINO";
+            }
+            else {
+                tipotramoStr = tipotramoStr + "_DEPOSITO";
+            }
+            tramo.setTipoTramo(TipoTramo.valueOf(tipotramoStr));
+            tramo.setRuta(ruta);
+            tramosEntidad.add(tramo);
+        }
+        ruta.setIdSolicitud(idSolicitud);
+        ruta.setTramos(tramosEntidad);
+        ruta = rutaRepository.save(ruta);
+
+        return ruta.getIdRuta();
     }
 
     @Transactional
     public Ruta actualizarRuta(Integer id, Ruta rutaActualizada) {
         Ruta rutaExistente = obtenerRutaPorId(id);
         rutaExistente.setTramos(rutaActualizada.getTramos());
-        rutaExistente.setCantidadTramos(rutaActualizada.getCantidadTramos());
-        rutaExistente.setCantidadDepositos(rutaActualizada.getCantidadDepositos());
         log.info("Ruta actualizada");
         return rutaRepository.save(rutaExistente);
     }
@@ -61,7 +96,7 @@ public class RutaService {
     @Transactional
     public void eliminarRuta(Integer id) {
         if (!rutaRepository.existsById(id)) {
-            log.warn("No se puedo eliminar.La ruta no se encontro con id:"+id);
+            log.warn("No se puedo eliminar. La ruta no se encontro con id: "+id);
             throw new RuntimeException("No se puede eliminar. Ruta no encontrada con id: " + id);
         }
         log.info("Ruta eliminada");
@@ -82,9 +117,9 @@ public class RutaService {
 
     public CostoFinalDto obtenerCostos(Integer idruta) {
         Ruta ruta = obtenerRutaPorId(idruta);
-        log.info("calculando el consumo de combustible");
+        log.info("Calculando el consumo de combustible");
         Double consumo = obtenerConsumoTotal(ruta.getTramos());
-        log.info("calculando la cantidad de dias");
+        log.info("Calculando la cantidad de dias");
         Integer cantDias = ruta.obtenerDiasEstadia();
         CostoFinalDto costo = new CostoFinalDto();
         costo.setCantTramos(ruta.getTramos().size());
@@ -111,11 +146,10 @@ public class RutaService {
 
     }
     public Double calcularDistancia(Tramo tramo){
-        Ubicacion origen = tramo.getUbicacionOrigen();
-        Ubicacion destino = tramo.getUbicacionDestino();
+        String origen = tramo.getCoordenadasOrigen();
+        String destino = tramo.getCoordenadasDestino();
 
-        String coordenadas = origen.getLongitud() + "," + origen.getLatitud() + ";"
-                + destino.getLongitud() + "," + destino.getLatitud();
+        String coordenadas = origen + ";" + destino;
 
         Double distancia = distanciaClient.obtenerDistancia(coordenadas);
 
@@ -124,29 +158,79 @@ public class RutaService {
 
     }
 
-    public List<RutaSugeridaDto> consultarRutasTentativas(List<Ruta> rutas){
+    public List<RutaSugeridaDto> consultarRutasTentativas(Integer idSolicitud){
         List<RutaSugeridaDto> rutaSugeridas = new ArrayList<>();
-        log.info("calculando distancia de rutas tentativas");
-        for (Ruta ruta : rutas) {
-           Double distanciaTotal = 0.0;
-           Double DuracionTotal = 0.0;
-           for (Tramo tramo : ruta.getTramos()) {
-               Ubicacion origen = tramo.getUbicacionOrigen();
-               Ubicacion destino = tramo.getUbicacionDestino();
-               String coordenadas = origen.getLongitud() + "," + origen.getLatitud() + ";"
-                       + destino.getLongitud() + "," + destino.getLatitud();
-               OsrmRouteDto resultados = distanciaClient.obtenerTiempoYDistancia(coordenadas);
-               distanciaTotal += resultados.getDistance();
-               DuracionTotal += resultados.getDuration();
-           }
-           RutaSugeridaDto rutaSugerida = new RutaSugeridaDto();
-           rutaSugerida.setDistancia(distanciaTotal);
-           rutaSugerida.setDuracion(DuracionTotal);
-           rutaSugerida.setRuta(ruta);
-           rutaSugerida.setCantidadTramos(ruta.getTramos().size());
-           rutaSugeridas.add(rutaSugerida);
-        };
-        log.info("devolviendo rutas tentativas");
+        if (solicitudClient.verificarSolicitud(idSolicitud)) {
+            log.info("Solicitud encontrada");
+            DatosSolicitudDto datosSolicitudDto = solicitudClient.obtenerDatosSolicitudPorNumero(idSolicitud);
+            rutaSugeridas.add(rutaSugeridaDirecta(datosSolicitudDto));
+            rutaSugeridas.add(rutaSugeridaConDeposito(datosSolicitudDto));
+
+        }
+        else {
+            log.warn("No existe la solicitud");
+            throw  new RuntimeException("No existe la solicitud");
+        }
+        log.info("Devolviendo las rutas tentativas");
         return rutaSugeridas;
     }
+    public RutaSugeridaDto rutaSugeridaDirecta (DatosSolicitudDto datosSolicitud) {
+        String coordenadas = datosSolicitud.getCoordenadasOrigen() + ";" + datosSolicitud.getCoordenadasDestino();
+        OsrmRouteDto tiempoYDistancia = distanciaClient.obtenerTiempoYDistancia(coordenadas);
+        RutaSugeridaDto rutaSugeridaDto = new RutaSugeridaDto();
+        rutaSugeridaDto.setNumeroDeAlternativa(1);
+        TramoSugeridoDto tramoSugeridoDto = new TramoSugeridoDto();
+        tramoSugeridoDto.setCordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
+        tramoSugeridoDto.setCordenadasDestino((datosSolicitud.getCoordenadasDestino()));
+        tramoSugeridoDto.setNroOrden(1);
+        rutaSugeridaDto.getTramos().add(tramoSugeridoDto);
+        Double consPromCamiones = camionRepository.promedioConsumo(datosSolicitud.getVolumenContendor(), datosSolicitud.getPesoContenedor());
+        Double costo = datosSolicitud.getValorVolumenTarifa()* datosSolicitud.getVolumenContendor() + datosSolicitud.getValorTramoTarifa()*rutaSugeridaDto.getTramos().size() + consPromCamiones * rutaSugeridaDto.getDistancia()/1000;
+        return  rutaSugeridaDto;
+    }
+    public RutaSugeridaDto rutaSugeridaConDeposito(DatosSolicitudDto datosSolicitud) {
+        List<Deposito> depositos = depositoRepository.findAll();
+        String coordenadasMenor = "";
+        Double distanciamenor = 0.0;
+        Double distanciaOrDes = distanciaClient.obtenerDistancia(datosSolicitud.getCoordenadasOrigen() + ";" + datosSolicitud.getCoordenadasDestino());
+        for (Deposito deposito : depositos) {
+            String coordenadasDeposito = deposito.getCoordenadas();
+            String coordenadasOrDep = datosSolicitud.getCoordenadasOrigen() + ";" + coordenadasDeposito;
+            String coordenadasDepDes = coordenadasDeposito + ";" +datosSolicitud.getCoordenadasDestino();
+            Double distanciaOrDep =  distanciaClient.obtenerDistancia(coordenadasOrDep);
+            Double distanciaDepDes = distanciaClient.obtenerDistancia(coordenadasDepDes);
+            if (coordenadasMenor.isEmpty()){
+                coordenadasMenor = coordenadasDeposito;
+                distanciamenor = distanciaOrDep;
+            }
+            else {
+                if ((distanciaOrDep <= distanciamenor) && (distanciaDepDes <= distanciaOrDes)){
+                    coordenadasMenor = coordenadasDeposito;
+                    distanciamenor = distanciaOrDes;
+                }
+            }
+        }
+        OsrmRouteDto tiempoYDistancia1 = distanciaClient.obtenerTiempoYDistancia(datosSolicitud.getCoordenadasOrigen() + ";" + coordenadasMenor);
+        OsrmRouteDto tiempoYDistancia2 = distanciaClient.obtenerTiempoYDistancia(coordenadasMenor + ";" + datosSolicitud.getCoordenadasDestino());
+        RutaSugeridaDto rutaSugeridaDto = new RutaSugeridaDto();
+        rutaSugeridaDto.setNumeroDeAlternativa(2);
+        TramoSugeridoDto tramoSugeridoDto1 = new TramoSugeridoDto();
+        tramoSugeridoDto1.setCordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
+        tramoSugeridoDto1.setCordenadasDestino(coordenadasMenor);
+        tramoSugeridoDto1.setNroOrden(1);
+        rutaSugeridaDto.getTramos().add(tramoSugeridoDto1);
+        TramoSugeridoDto tramoSugeridoDto2 = new TramoSugeridoDto();
+        tramoSugeridoDto2.setCordenadasOrigen(coordenadasMenor);
+        tramoSugeridoDto2.setCordenadasDestino(datosSolicitud.getCoordenadasDestino());
+        tramoSugeridoDto2.setNroOrden(2);
+        rutaSugeridaDto.getTramos().add(tramoSugeridoDto2);
+        rutaSugeridaDto.setDuracion(tiempoYDistancia1.getDuration() + tiempoYDistancia2.getDuration());
+        rutaSugeridaDto.setDistancia(tiempoYDistancia1.getDistance() + tiempoYDistancia2.getDistance());
+        Double consPromCamiones = camionRepository.promedioConsumo(datosSolicitud.getVolumenContendor(), datosSolicitud.getPesoContenedor());
+        Double costo = datosSolicitud.getValorVolumenTarifa()* datosSolicitud.getVolumenContendor() + datosSolicitud.getValorTramoTarifa()*rutaSugeridaDto.getTramos().size() + consPromCamiones * rutaSugeridaDto.getDistancia()/1000;
+        rutaSugeridaDto.setCostoEstimado(costo);
+        return rutaSugeridaDto;
+
+    }
+
 }

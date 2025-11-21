@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,15 +19,14 @@ import java.util.List;
 public class TramoService {
     private final TramoRepository tramoRepository;
     private final CamionRepository camionRepository;
-    private final RutaRepository rutaRepository;
-    private final UbicacionRepository ubicacionRepository;
-    private final TipoTramoRepository tipoTramoRepository;
+
+    private final SolicitudClient solicitudClient;
     private static final Logger log = LoggerFactory.getLogger(TramoService.class);
 
 
     @Transactional(readOnly = true)
     public List<Tramo> obtenerTodasLosTramos() {
-        log.info("obteniendo todos los tramos");
+        log.info("Obteniendo todos los tramos");
         return tramoRepository.findAll();
     }
 
@@ -33,7 +34,7 @@ public class TramoService {
     public Tramo obtenerTramoPorId(Integer id) {
         return tramoRepository.findById(id)
                 .orElseThrow(() ->{
-                    log.warn("no se encontro el tramo");
+                    log.warn("No se encontro el tramo");
                     return new RuntimeException("Tramo no encontrado con id: " + id);
                 });
     }
@@ -41,31 +42,12 @@ public class TramoService {
     @Transactional
     public Tramo crearTramo(TramoDto tramoDto) {
         Tramo tramo = new Tramo();
-        Ubicacion origen = ubicacionRepository.findById(tramoDto.getUbicacionOrigenId())
-                .orElseThrow(() ->{
-                    log.warn("Ubicacion de origen no encontrada");
-                    return new RuntimeException("Ubicación Origen no encontrada");});
-        log.info("Ubicacion de origen encontrada");
-        tramo.setUbicacionOrigen(origen);
 
-        Ubicacion destino = ubicacionRepository.findById(tramoDto.getUbicacionDestinoId())
-                .orElseThrow(() -> {
-                    log.warn("no se encontro la ubicacion de destino");
-                    return new RuntimeException("Ubicación Destino no encontrada");
-                });
-        log.info("ubicacion destino encontrada");
-        tramo.setUbicacionDestino(destino);
-
-        // 3. Cargar TipoTramo
-        TipoTramo tipo = tipoTramoRepository.findById(tramoDto.getTipoTramo())
-                .orElseThrow(() -> {
-                    log.warn("Tipo de tramo No encontrado");
-                    return new RuntimeException("Tipo de Tramo no encontrado");
-                });
-        log.info("tipo de tramo encontrado");
-        tramo.setTipoTramo(tipo);
+       tramo.setCoordenadasOrigen(tramoDto.getCoordenadasOrigen());
+       tramo.setCoordenadasDestino(tramoDto.getCoordenadasDestino());
+        tramo.setTipoTramo(tramoDto.getTipoTramo());
         tramo.setEstadoTramo(tramoDto.getEstadoTramo());
-        log.info("creando tramo");
+        log.info("Creando tramo");
         return tramoRepository.save(tramo);
     }
 
@@ -76,12 +58,9 @@ public class TramoService {
         tramoExistente.setTipoTramo(tramoActualizado.getTipoTramo());
         tramoExistente.setCamion(tramoActualizado.getCamion());
         tramoExistente.setRuta(tramoExistente.getRuta());
-        tramoExistente.setCostoAproximado(tramoExistente.getCostoAproximado());
         tramoExistente.setFechaHoraFin(tramoActualizado.getFechaHoraFin());
         tramoExistente.setFechaHoraInicio(tramoActualizado.getFechaHoraInicio());
         tramoExistente.setNroOrden(tramoActualizado.getNroOrden());
-        tramoExistente.setUbicacionDestino(tramoActualizado.getUbicacionDestino());
-        tramoExistente.setUbicacionOrigen(tramoActualizado.getUbicacionOrigen());
         log.info("Tramo Actualizado");
         return tramoRepository.save(tramoExistente);
     }
@@ -89,35 +68,79 @@ public class TramoService {
     @Transactional
     public void eliminarTramo(Integer id) {
         if (!tramoRepository.existsById(id)) {
-            log.warn("No se pudo eliminar. El tramo no se encontro con id:"+id);
+            log.warn("No se pudo eliminar. Tramo no encontrado con id: "+id);
             throw new RuntimeException("No se puede eliminar. Tramo no encontrado con id: " + id);
         }
         log.info("Tramo eliminado");
         tramoRepository.deleteById(id);
     }
 
+    @Transactional
+    public Tramo iniciarTramo(Integer idTramo) {
+        Tramo tramoAIniciar = obtenerTramoPorId(idTramo);
+        Integer nroOrden = tramoAIniciar.getNroOrden();
+        Integer idSolicitud = tramoAIniciar.getRuta().getIdSolicitud();
 
-    public Tramo actualizarEstadoTramo(Integer idTramo, String estadoTramo) {
-        Tramo tramoExistente = obtenerTramoPorId(idTramo);
-        tramoExistente.setEstadoTramo(estadoTramo);
-        return tramoRepository.save(tramoExistente);
+        if (tramoAIniciar.getNroOrden() == 1) {
+            tramoAIniciar.setEstadoTramo("INICIADO");
+
+            solicitudClient.iniciarSolicitud(idSolicitud);
+        }
+        else {
+            Tramo tramoAnterior = tramoRepository.encontrarTramoPorNroOrden(tramoAIniciar.getNroOrden() - 1, tramoAIniciar.getRuta().getIdRuta());
+            if (tramoAnterior.getEstadoTramo().equals("FINALIZADO")){
+                tramoAIniciar.setEstadoTramo("INICIADO");
+                solicitudClient.reanudarSolicitud(idSolicitud);
+            }
+            else {
+                log.error("El tramo anterior aún no finalizó");
+                throw new RuntimeException("El tramo anterior no finalizó");
+
+            }
+        }
+        tramoAIniciar.setFechaHoraInicio(LocalDate.now());
+        log.info("Tramo con id: " + idTramo + " cambiado a estado INICIAR");
+        return tramoRepository.save(tramoAIniciar);
+    }
+
+    @Transactional
+    public Tramo finalizarTramo(Integer idTramo) {
+        Tramo tramoAFinalizar = obtenerTramoPorId(idTramo);
+        Integer idSolicitud = tramoAFinalizar.getRuta().getIdSolicitud();
+        if (tramoAFinalizar.getEstadoTramo().equals("INICIADO")) {
+            if (tramoAFinalizar.getNroOrden() < tramoAFinalizar.getRuta().getTramos().size()) {
+                log.info("Tramo con id: " + idTramo + " cambiado a estado FINALIZADO");
+                solicitudClient.ponerEnDeposito(idSolicitud);
+            }
+            else {
+                solicitudClient.finalizarSolicitud(idSolicitud);
+
+            }
+
+        }else{
+            log.warn("No se pudo finalizar. Tramo no está iniciado");
+            throw new RuntimeException("Tramo no esta iniciado");
+        }
+        tramoAFinalizar.setEstadoTramo("FINALIZADO");
+        tramoAFinalizar.setFechaHoraFin(LocalDate.now());
+        return tramoRepository.save(tramoAFinalizar);
     }
 
     public Tramo asignarCamionATramo(Integer idTramo,String camionPatente) {
         String patenteLimpia = camionPatente.trim().replace("\"", "");
         Camion camion = camionRepository.findById(patenteLimpia)
                 .orElseThrow(() ->{
-                    log.warn("Camion no encontrado con ID"+ camionPatente);
-                    return new RuntimeException("Camion no encontrado con ID: " + camionPatente)
+                    log.warn("Camion no encontrado con patente: "+ camionPatente);
+                    return new RuntimeException("Camion no encontrado con patente: " + camionPatente)
                 ;});
         camion.setDisponibilidad(false);
         Tramo tramo = obtenerTramoPorId(idTramo);
         tramo.setCamion(camion);
-        log.info("Tramo fue asignado a un camion con ID:"+ camionPatente);
+        log.info("Tramo fue asignado a un camion con patente: "+ camionPatente);
         return tramoRepository.save(tramo);
     }
     public List<Tramo> obtenerTramosPorCamionero(Integer idCamionero) {
-        log.info("Obtenidos tramos por camionero Id:"+idCamionero);
+        log.info("Obtenidos tramos por camionero id :"+idCamionero);
         return tramoRepository.encontrarTramosCamionero(idCamionero);
     }
 }

@@ -11,15 +11,14 @@ import lombok.*;
 public class Contenedor {
     @Id
     @Column(name="id_contenedor")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idContenedor;
 
     @Column(name="peso")
     private Double peso;
 
-
     @Column(name="volumen")
     private Double volumen;
-
 
     @Column(name="estado")
     private String estado;

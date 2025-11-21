@@ -1,11 +1,9 @@
 package com.example.ms_solicitud.service;
 
-import com.example.ms_solicitud.model.Cliente;
-import com.example.ms_solicitud.model.Contenedor;
-import com.example.ms_solicitud.model.Solicitud;
-import com.example.ms_solicitud.model.Tarifa;
-import com.example.ms_solicitud.model.dto.CostoFinalDto;
-import com.example.ms_solicitud.model.dto.SolicitudDto;
+import com.example.ms_solicitud.model.*;
+import com.example.ms_solicitud.model.cambioEstado.CambioEstado;
+import com.example.ms_solicitud.model.cambioEstado.CambioEstadoId;
+import com.example.ms_solicitud.model.dto.*;
 import com.example.ms_solicitud.repository.ClienteRepository;
 import com.example.ms_solicitud.repository.ContenedorRepository;
 import com.example.ms_solicitud.repository.SolicitudRepository;
@@ -14,7 +12,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 @Service
@@ -44,22 +47,45 @@ public class SolicitudService {
     @Transactional
     public Solicitud crearSolicitud(SolicitudDto solicitudDto) {
         Solicitud solicitud = new Solicitud();
-        Cliente cliente = solicitudDto.getCliente();
-        //ver si existe el cliente
+
+        Cliente cliente;
         log.info("buscando cliente con ID:" + solicitudDto.getCliente().getDni());
         if (!clienteRepository.existsById(solicitudDto.getCliente().getDni())) {
             log.info("cliente no encontrado, creando uno nuevo");
             cliente = clienteRepository.save(solicitudDto.getCliente());
-
             log.info("Cliente creado");
+
+        } else{
+            cliente = clienteRepository.findById(solicitudDto.getCliente().getDni())
+                    .orElseThrow(() -> new RuntimeException("cliente no encontrado"));
         }
         solicitud.setCliente(cliente);
-        //crea el contenedor
+
         log.info("creando contenedor");
-        Contenedor contenedor = contenedorRepository.save(solicitudDto.getContenedor());
-        solicitud.setContenedor(contenedor);
-        solicitud.setCoordenadasOrigen(solicitudDto.getCoordenadasOrigen());
-        solicitud.setCoordenadasDestino(solicitudDto.getCoordenadasDestino());
+        Optional<Contenedor> contenedorEncontrado = contenedorRepository.findById(solicitudDto.getContenedor().getIdContenedor());
+        Contenedor contenedor;
+        if(contenedorEncontrado.isEmpty()) {
+            log.info("Contenedor con ID: " + solicitudDto.getContenedor().getIdContenedor() + " no encontrado, creando uno nuevo...");
+            contenedor = solicitudDto.getContenedor();
+            contenedor.setEstado("EN ORIGEN");
+            contenedor = contenedorRepository.save(contenedor);
+            log.info("Contenedor nuevo creado y marcado como EN ORIGEN.");
+        } else{
+            contenedor = contenedorEncontrado.get();
+            if(contenedor.getEstado().equals("EN DESTINO")){
+                log.info("Contenedor disponible, asignandolo a la solicitud y marcandolo como en origen");
+                contenedor.setEstado("EN ORIGEN");
+                contenedor = contenedorRepository.save(contenedor);
+            }
+            else{
+                log.error("No se puede asignar el contenedor a la solicitud, ya se encuentra en otra solicitud");
+            }}
+            log.info("Solicitud creada en estado: CREADA");
+            solicitud.setContenedor(contenedor);
+            solicitud.setCoordenadasOrigen(solicitudDto.getCoordenadasOrigen());
+            solicitud.setCoordenadasDestino(solicitudDto.getCoordenadasDestino());
+            solicitud.setEstadoActual(EstadoSolicitud.CREADA);
+
         log.info("creando solicitud");
         return solicitudRepository.save(solicitud);
     }
@@ -70,16 +96,17 @@ public class SolicitudService {
         Solicitud solicitudExistente = obtenerSolicitudPorNumero(numero);
 
         solicitudExistente.setNumero(solicitudActualizada.getNumero());
-        solicitudExistente.setCostoEstimado(solicitudActualizada.getConsumoEstimado());
+        solicitudExistente.setCostoEstimado(solicitudActualizada.getCostoEstimado());
         solicitudExistente.setTiempoEstimado(solicitudActualizada.getTiempoEstimado());
         solicitudExistente.setTiempoReal(solicitudActualizada.getTiempoReal());
-        solicitudExistente.setConsumoEstimado(solicitudActualizada.getConsumoEstimado());
+
         solicitudExistente.setCostoFinal(solicitudActualizada.getCostoFinal());
         solicitudExistente.setContenedor(solicitudActualizada.getContenedor());
         solicitudExistente.setCliente(solicitudActualizada.getCliente());
         solicitudExistente.setIdTarifa(solicitudActualizada.getIdTarifa());
         solicitudExistente.setCoordenadasOrigen(solicitudActualizada.getCoordenadasOrigen());
         solicitudExistente.setCoordenadasDestino(solicitudActualizada.getCoordenadasDestino());
+        solicitudExistente.setEstadoActual(solicitudActualizada.getEstadoActual());
         log.info("Actualizando la solicitud" + numero);
         return solicitudRepository.save(solicitudExistente);
     }
@@ -108,33 +135,54 @@ public class SolicitudService {
                     log.warn("solicitud con ID: "+ idSolicitud + "no encontrada");
                     return new RuntimeException("no se encontro la solicitud");
                 });
-        solicitud.getContenedor().setEstado(estado);
+        solicitud.setEstadoActual(EstadoSolicitud.valueOf(estado));
         log.info("Actualizando estado de solicitud " + idSolicitud + " a " + estado);
         return solicitudRepository.save(solicitud);
     }
     @Transactional
-    public Solicitud asignarRuta(Integer idSolicitud, Integer idRuta){
+    public Solicitud asignarRuta(Integer idSolicitud) {
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
-        boolean rutaExiste = rutasClient.verificarRuta(idRuta);
-        if(!rutaExiste) {
-            log.warn("La ruta " + idRuta + " no existe.");
-            throw new RuntimeException("Ruta no existe");
+        List<RutaSugeridaDto> rutasSugeridas = rutasClient.buscarRutastentativas(idSolicitud);
+        RutaSugeridaDto rutaSugeridaSeleccionada = null;
+        Double costoAproximado = 0.0;
+        for(RutaSugeridaDto rutaSugerida : rutasSugeridas) {
+            if (costoAproximado == 0.0) {
+                costoAproximado = rutaSugerida.getCostoEstimado();
+                rutaSugeridaSeleccionada = rutaSugerida;
+            } else {
+                if ((costoAproximado >= rutaSugerida.getCostoEstimado())) {
+                    costoAproximado = rutaSugerida.getCostoEstimado();
+                    rutaSugeridaSeleccionada = rutaSugerida;
+                }
+            }
+        }
+        if (rutaSugeridaSeleccionada == null) {
+            throw new IllegalStateException("Error al seleccionar la mejor ruta tentativa.");
+        }
+        if (solicitud.getEstadoActual() == EstadoSolicitud.CREADA) {
+            solicitud.setEstadoActual(EstadoSolicitud.APROBADA);
+
         }
 
+        Integer idRuta = rutasClient.crearRuta(rutaSugeridaSeleccionada , solicitud.getCoordenadasOrigen() , solicitud.getCoordenadasDestino(), idSolicitud);
+        solicitud.setCostoEstimado(rutaSugeridaSeleccionada.getCostoEstimado());
+        solicitud.setTiempoEstimado(rutaSugeridaSeleccionada.getDuracion());
         solicitud.setIdRuta(idRuta);
         return solicitudRepository.save(solicitud);
     }
 
     @Transactional
-    public Solicitud asignarTarifa(Integer idSolicitud, Tarifa tarifa){
-        if(!tarifaRepository.existsById(tarifa.getIdTarifa())){
-            log.warn("tarifa con ID: " + tarifa.getIdTarifa() + "no encontrada");
-        }
+    public Solicitud asignarTarifa(Integer idSolicitud, Integer tarifaId){
+        Tarifa tarifa = tarifaRepository.findById(tarifaId)
+        .orElseThrow(() -> {
+            log.warn("tarifa con ID: " + tarifaId + "no encontrada");
+            throw new NoSuchElementException("Tarifa no encontrada con ID: " + tarifaId);
+            });
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);;
         solicitud.setIdTarifa(tarifa);
-        log.info("Tarifa " + tarifa.getIdTarifa() + " asignada a solicitud " + idSolicitud);
+        log.info("Tarifa " + tarifaId + " asignada a solicitud " + idSolicitud);
         return solicitudRepository.save(solicitud);
-    }
+        }
 
    @Transactional
    public Double calcularCostoFinal(Integer idSolicitud) {
@@ -149,5 +197,76 @@ public class SolicitudService {
 
         return costoFinalCalculado;
    }
+
+   @Transactional
+   public DatosSolicitudDto obtenerDatosSolicitudPorNumero(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        DatosSolicitudDto datosSolicitud = new DatosSolicitudDto();
+        datosSolicitud.setCoordenadasDestino(solicitud.getCoordenadasDestino());
+        datosSolicitud.setCoordenadasOrigen(solicitud.getCoordenadasOrigen());
+        datosSolicitud.setPesoContenedor(solicitud.getContenedor().getPeso());
+        datosSolicitud.setVolumenContendor(solicitud.getContenedor().getVolumen());
+        datosSolicitud.setValorVolumenTarifa(solicitud.getIdTarifa().getValorPorVolumen());
+        datosSolicitud.setValorTramoTarifa(solicitud.getIdTarifa().getValorFijoTramo());
+
+        return datosSolicitud;
+   }
+   @Transactional
+    public List<HistorialDto> obtenerHistorialSolicitudPorNumero(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        List<HistorialDto> historialDtos = new ArrayList<>();
+        for (CambioEstado cambioEstado : solicitud.getCambioEstado()) {
+            HistorialDto historialDto = new HistorialDto();
+            historialDto.setEstado(cambioEstado.getEstado());
+            historialDto.setFechaInicio(cambioEstado.getCambioEstadoId().getFechaCambio());
+            historialDtos.add(historialDto);
+        }
+        return historialDtos;
+   }
+
+   @Transactional
+    public void iniciarSolicitud(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+       LocalDateTime fecha = LocalDateTime.now();
+       CambioEstado cambioEstado = new CambioEstado();
+       CambioEstadoId cambioEstadoId = new CambioEstadoId();
+       cambioEstadoId.setFechaCambio(fecha);
+       cambioEstadoId.setIdSolicitud(idSolicitud);
+       cambioEstado.setEstado(EstadoSolicitud.EN_CURSO);
+       cambioEstado.setSolicitud(solicitud);
+       solicitud.getCambioEstado().add(cambioEstado);
+       solicitud.setEstadoActual(EstadoSolicitud.EN_CURSO);
+       solicitud.getContenedor().setEstado("EN CAMINO");
+       Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+   }
+
+    @Transactional
+    public void reanudarViajeContenedor(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        solicitud.getContenedor().setEstado("EN CAMINO");
+        Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+    }
+    @Transactional
+    public void dejarContenedorEnDeposito(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        solicitud.getContenedor().setEstado("EN DEPOSITO");
+        Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+    }
+
+    @Transactional
+    public void finalizarSolicitud(Integer idSolicitud) {
+        Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
+        LocalDateTime fecha = LocalDateTime.now();
+        CambioEstado cambioEstado = new CambioEstado();
+        CambioEstadoId cambioEstadoId = new CambioEstadoId();
+        cambioEstadoId.setFechaCambio(fecha);
+        cambioEstadoId.setIdSolicitud(idSolicitud);
+        cambioEstado.setEstado(EstadoSolicitud.FINALIZADA);
+        cambioEstado.setSolicitud(solicitud);
+        solicitud.getCambioEstado().add(cambioEstado);
+        solicitud.setEstadoActual(EstadoSolicitud.FINALIZADA);
+        solicitud.getContenedor().setEstado("ENTREGADO");
+        Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+    }
 
 }

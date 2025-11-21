@@ -8,6 +8,6 @@ import lombok.Getter;
 public class SolicitudDto {
     private Contenedor contenedor;
     private Cliente cliente;
-    private Double coordenadasOrigen;
-    private Double coordenadasDestino;
+    private String coordenadasOrigen;
+    private String coordenadasDestino;
 }

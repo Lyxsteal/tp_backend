@@ -2,7 +2,7 @@ package com.example.ms_solicitud.controller;
 
 import com.example.ms_solicitud.model.Solicitud;
 import com.example.ms_solicitud.model.Tarifa;
-import com.example.ms_solicitud.model.dto.SolicitudDto;
+import com.example.ms_solicitud.model.dto.*;
 import com.example.ms_solicitud.security.AuthenticatedUser;
 import com.example.ms_solicitud.security.UserHeaderInterceptor;
 import com.example.ms_solicitud.service.ContenedorService;
@@ -45,10 +45,21 @@ public class SolicitudController {
         return service.obtenerSolicitudesPorCliente(idCliente);
     }
 
-   @GetMapping("costo-final/{idSolicitud}")
+    @GetMapping("costo-final/{idSolicitud}")
     public Double calcularCostoFinal(@PathVariable Integer idSolicitud) {
         return service.calcularCostoFinal(idSolicitud);
     }
+
+    @GetMapping("datos-solicitud/{idSolicitud}")
+    public DatosSolicitudDto obtenerDatossolicitud(@PathVariable Integer idSolicitud) {
+        return service.obtenerDatosSolicitudPorNumero(idSolicitud);
+    }
+
+    @GetMapping("historial-solicitud/{idSolicitud}")
+    public List<HistorialDto> obtenerHistorialSolicitud(@PathVariable Integer idSolicitud) {
+        return service.obtenerHistorialSolicitudPorNumero(idSolicitud);
+    }
+
     //put
     @PutMapping("estados/{idSolicitud}")
     public ResponseEntity<Solicitud> actualizarEstado(@PathVariable Integer idSolicitud, @RequestBody String estado){
@@ -56,13 +67,39 @@ public class SolicitudController {
     }
 
     @PutMapping("asignar-ruta/{idSolicitud}")
-    public ResponseEntity<Solicitud> asignarRuta(@PathVariable Integer idSolicitud, @RequestBody Integer idRuta){
-        return ResponseEntity.ok(service.asignarRuta(idSolicitud, idRuta));
+    public ResponseEntity<Solicitud> asignarRuta(@PathVariable Integer idSolicitud){
+        return ResponseEntity.ok(service.asignarRuta(idSolicitud));
     }
+
     @PutMapping("asignar-tarifa/{idSolicitud}")
-    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Tarifa tarifa){
-        return ResponseEntity.ok(service.asignarTarifa(idSolicitud, tarifa));
+    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Integer tarifaId){
+        return ResponseEntity.ok(service.asignarTarifa(idSolicitud, tarifaId));
     }
+
+    @PutMapping("iniciar-solicitud/{idSolicitud}")
+    public ResponseEntity<Void> iniciarSolicitud(@PathVariable Integer idSolicitud){
+        service.iniciarSolicitud(idSolicitud);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("reanudar-viaje/{idSolicitud}")
+    public ResponseEntity<Void> reanudarViaje (@PathVariable Integer idSolicitud){
+        service.reanudarViajeContenedor(idSolicitud);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("en-deposito/{idSolicitud}")
+    public ResponseEntity<Void> dejarContenedorEnDeposito (@PathVariable Integer idSolicitud){
+        service.dejarContenedorEnDeposito(idSolicitud);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("finalizar-solicitud/{idSolicitud}")
+    public ResponseEntity<Void> finalizarSolicitud (@PathVariable Integer idSolicitud){
+        service.finalizarSolicitud(idSolicitud);
+        return ResponseEntity.ok().build();
+    }
+
     //post
     @PostMapping
     public ResponseEntity<Solicitud> crearSolicitud (@RequestBody SolicitudDto solicitudDto){
@@ -70,5 +107,5 @@ public class SolicitudController {
         return ResponseEntity.ok(solicitud);
     }
 
-    //put
+
 }

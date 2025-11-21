@@ -21,14 +21,13 @@ public class Ruta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idRuta;
 
-    @Column(name="cantidadTramos")
-    private Integer cantidadTramos;
+    @Column(name = "idSolicitud")
+    private Integer idSolicitud;
 
-    @Column(name="cantidadDepositos")
-    private Integer cantidadDepositos;
 
-    @OneToMany(mappedBy = "ruta", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "ruta",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tramo> tramos;
+
 
     public Integer obtenerDiasEstadia(){
         Integer diasEstadia = 0;

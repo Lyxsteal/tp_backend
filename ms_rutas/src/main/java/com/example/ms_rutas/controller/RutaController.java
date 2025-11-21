@@ -6,6 +6,7 @@ import com.example.ms_rutas.model.dto.CostoFinalDto;
 import com.example.ms_rutas.model.dto.RutaSugeridaDto;
 import com.example.ms_rutas.service.RutaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -33,9 +34,9 @@ public class RutaController {
         Integer numeroRuta = Integer.parseInt(idRuta);
         return rutaService.obtenerCostos(numeroRuta);
     }
-    @PostMapping("/rutas-tentativas")
-    public List<RutaSugeridaDto> getRutasTentativas(@RequestBody List<Ruta> rutas) {
-        return rutaService.consultarRutasTentativas(rutas);
+    @GetMapping("/rutas-tentativas")
+    public List<RutaSugeridaDto> getRutasTentativas(@RequestParam Integer idSolicitud) {
+        return rutaService.consultarRutasTentativas(idSolicitud);
 
     }
     //put
@@ -44,11 +45,11 @@ public class RutaController {
         return ResponseEntity.ok(rutaService.actualizarRuta(idRuta, ruta));
     }
 
-    //put
     //post
     @PostMapping
-    public ResponseEntity<Ruta> crearRuta(@RequestBody Ruta ruta) {
-        return ResponseEntity.ok(rutaService.crearRuta(ruta));
+    public ResponseEntity<Integer> crearRuta(@RequestBody RutaSugeridaDto rutaSugeridaDto, @RequestParam String coordenadasOrigen , @RequestParam String coordenadasDestino, @RequestParam Integer idSolicitud) {
+        Integer idRutaCreada = rutaService.crearRuta(rutaSugeridaDto, coordenadasOrigen, coordenadasDestino, idSolicitud);
+        return ResponseEntity.status(HttpStatus.CREATED).body(idRutaCreada);
     }
     @PutMapping("/asignacion-tramos/{idRuta}")
     public ResponseEntity<Ruta> asignarTramosARuta(@PathVariable Integer idRuta, @RequestBody List<Tramo> tramos) {
@@ -61,4 +62,6 @@ public class RutaController {
         rutaService.eliminarRuta(idRuta);
         return ResponseEntity.noContent().build();
     }
+
+
 }

@@ -29,33 +29,24 @@ public class Tramo {
     @Column(name="nro_orden")
     private Integer  nroOrden;
 
+    @Column(name="coordenadas_origen")
+    private String coordenadasOrigen;
 
-    @JoinColumn(name = "id_ubicacion_origen")
-    @OneToOne(fetch = FetchType.EAGER)
-    private Ubicacion ubicacionOrigen;
-
-
-    @JoinColumn(name ="id_ubicacion_destino")
-    @OneToOne(fetch = FetchType.EAGER)
-    private Ubicacion ubicacionDestino;
+    @Column(name="coordenadas_destino")
+    private String coordenadasDestino;
 
     @JoinColumn(name="patente_camion")
     @OneToOne(fetch = FetchType.EAGER)
     private Camion camion;
 
-    @JoinColumn(name ="id_tipo_tramo")
-    @OneToOne(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_tramo")
     private TipoTramo tipoTramo;
 
 
     @Column(name="estado_tramo")
     private String estadoTramo;
 
-    @Column(name="costo_aproximado")
-    private Float  costoAproximado;
-
-    @Column(name="costo_real")
-    private Float  costoReal;
 
     @Column(name="fecha_hora_inicio")
     private LocalDate fechaHoraInicio;

@@ -1,0 +1,17 @@
+Contenedor:
+- En origen
+- En camino
+- En deposito
+- En destino
+
+Tramo:
+- En espera
+- Iniciado
+- Finalizado
+
+Solicitud:
+- Creada
+- Aprobada
+- En curso
+- Finalizada
+
