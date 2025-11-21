@@ -1,6 +1,7 @@
 package com.example.ms_solicitud.controller;
 
 import com.example.ms_solicitud.model.Contenedor;
+import com.example.ms_solicitud.model.dto.ContenedorDto;
 import com.example.ms_solicitud.service.ContenedorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +38,8 @@ import java.util.List;
         }
         //post
         @PostMapping
-        public ResponseEntity<Contenedor> crearContenedor(@RequestBody Contenedor contenedor) {
-            Contenedor nuevo = contenedorService.crearContenedor(contenedor);
+        public ResponseEntity<Contenedor> crearContenedor(@RequestBody ContenedorDto contenedorDto) {
+            Contenedor nuevo = contenedorService.crearContenedor(contenedorDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
         }
         //put

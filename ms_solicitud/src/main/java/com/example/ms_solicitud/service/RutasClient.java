@@ -29,7 +29,7 @@ public class RutasClient {
 
     public List<RutaSugeridaDto> buscarRutastentativas(Integer idSolicitud) {
         // Usamos la URL base + el endpoint
-        String url = msRutasBaseUrl + "/api/v1/rutas/rutas-tentativas/" + idSolicitud;
+        String url = msRutasBaseUrl + "/api/v1/rutas/rutas-tentativas?idSolicitud=" + idSolicitud;
         RutaSugeridaDto[] rutasSugeridas = restTemplate.getForObject(url,  RutaSugeridaDto[].class);
 
         return Arrays.asList(rutasSugeridas);
@@ -42,7 +42,7 @@ public class RutasClient {
         return restTemplate.getForObject(url, CostoFinalDto.class);
     }
     public Integer crearRuta(RutaSugeridaDto rutaSugerida, String coordenadasOrigen, String coordenadasDestino, Integer idSolicitud) {
-        String url = msRutasBaseUrl + "/api/v1/rutas/" + "?coordenadasOrigen=" + coordenadasOrigen + "&coordenadasDestino=" + coordenadasDestino + "&idSolicitud=" + idSolicitud;
+        String url = msRutasBaseUrl + "/api/v1/rutas" + "?coordenadasOrigen=" + coordenadasOrigen + "&coordenadasDestino=" + coordenadasDestino + "&idSolicitud=" + idSolicitud;
         Integer idRuta = restTemplate.postForObject(url, rutaSugerida, Integer.class);
         return idRuta;
     }

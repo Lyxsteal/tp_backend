@@ -2,6 +2,7 @@ package com.example.ms_solicitud.service;
 
 
 import com.example.ms_solicitud.model.Contenedor;
+import com.example.ms_solicitud.model.dto.ContenedorDto;
 import com.example.ms_solicitud.repository.ContenedorRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -32,8 +33,12 @@ public class ContenedorService {
     }
 
     @Transactional
-    public Contenedor crearContenedor(Contenedor contenedor) {
+    public Contenedor crearContenedor(ContenedorDto contenedorDto) {
         log.info("Creando contenedor...");
+        Contenedor contenedor = new Contenedor();
+        contenedor.setEstado("EN ORIGEN");
+        contenedor.setPeso(contenedorDto.getPeso());
+        contenedor.setVolumen(contenedorDto.getVolumen());
         return contenedorRepository.save(contenedor);
     }
 

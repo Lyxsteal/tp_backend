@@ -67,6 +67,7 @@ public class SolicitudService {
         if(contenedorEncontrado.isEmpty()) {
             log.info("Contenedor con ID: " + solicitudDto.getContenedor().getIdContenedor() + " no encontrado, creando uno nuevo...");
             contenedor = solicitudDto.getContenedor();
+            contenedor.setIdContenedor(null);
             contenedor.setEstado("EN ORIGEN");
             contenedor = contenedorRepository.save(contenedor);
             log.info("Contenedor nuevo creado y marcado como EN ORIGEN.");
@@ -75,6 +76,7 @@ public class SolicitudService {
             if(contenedor.getEstado().equals("EN DESTINO")){
                 log.info("Contenedor disponible, asignandolo a la solicitud y marcandolo como en origen");
                 contenedor.setEstado("EN ORIGEN");
+                contenedor.setTiempoEstadia(0);
                 contenedor = contenedorRepository.save(contenedor);
             }
             else{

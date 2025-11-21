@@ -30,27 +30,27 @@ public class SolicitudClient {
         }
     }
     public DatosSolicitudDto obtenerDatosSolicitudPorNumero(Integer idSolicitud) {
-        String url = msSolicitudBaseUrl + "api/v1/solicitudes/datos-solicitud/" + idSolicitud;
+        String url = msSolicitudBaseUrl + "/api/v1/solicitudes/datos-solicitud/" + idSolicitud;
         return restTemplate.getForObject(url, DatosSolicitudDto.class);
     }
 
     public void iniciarSolicitud(Integer idSolicitud) {
-        String url = msSolicitudBaseUrl + "api/v1/solicitudes/iniciar-solicitud/" + idSolicitud;
+        String url = msSolicitudBaseUrl + "/api/v1/solicitudes/iniciar-solicitud/" + idSolicitud;
         restTemplate.put(url, idSolicitud);
 
     }
 
     public void reanudarSolicitud(Integer idSolicitud) {
-        String url = msSolicitudBaseUrl + "api/v1/solicitudes/reanudar-viaje/" + idSolicitud;
+        String url = msSolicitudBaseUrl + "/api/v1/solicitudes/reanudar-viaje/" + idSolicitud;
         restTemplate.put(url,idSolicitud);
     }
 
     public void ponerEnDeposito(Integer idSolicitud) {
-        String url = msSolicitudBaseUrl + "api/v1/solicitudes/en-deposito/" + idSolicitud;
+        String url = msSolicitudBaseUrl + "/api/v1/solicitudes/en-deposito/" + idSolicitud;
         restTemplate.put(url,idSolicitud);
     }
     public void finalizarSolicitud(Integer idSolicitud) {
-        String url = msSolicitudBaseUrl + "api/v1/solicitudes/finalizar-solicitud/" + idSolicitud;
+        String url = msSolicitudBaseUrl + "/api/v1/solicitudes/finalizar-solicitud/" + idSolicitud;
         restTemplate.put(url,idSolicitud);
     }
 

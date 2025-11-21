@@ -8,6 +8,5 @@ public class CamionDto {
     private Integer idCamionero;
     private Double capacidadPeso;
     private Double capacidadVolumen;
-    private Float costoBaseTranslado;
     private Float consCombKm;
 }

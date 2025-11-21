@@ -14,14 +14,20 @@ public class DistanciaClient {
     private final RestTemplate restTemplate;
     private static final Logger log = LoggerFactory.getLogger(DistanciaClient.class);
 
-    public Double obtenerDistancia(String cooredenadas) {
+    public Double obtenerDistancia(String coordenadas) {
         log.info("Obteniendo distancia: ");
-        String url = "http://osrm:5000/route/v1/driving/" + cooredenadas;
+        String coordenadasLimpia = coordenadas.replace("\\s+", "").trim();
+        String url = "http://osrm:5000/route/v1/driving/" + coordenadasLimpia;
         return restTemplate.getForObject(url, OsrmResponseDto.class).getRoutes().get(0).getDistance();
     }
 
     public OsrmRouteDto obtenerTiempoYDistancia(String coordenadas) {
-        String url = "http://osrm:5000/trip/v1/driving/" + coordenadas;
+        String coordenadasLimpia = coordenadas.replace("\\s+", "").trim();
+        String url = "http://osrm:5000/route/v1/driving/" + coordenadasLimpia;
+        OsrmResponseDto response = restTemplate.getForObject(url, OsrmResponseDto.class);
+        if (response == null || response.getRoutes() == null || response.getRoutes().isEmpty()) {
+            throw new RuntimeException("OSRM no encontró rutas válidas para las coordenadas proporcionadas.");
+        }
         return restTemplate.getForObject(url, OsrmResponseDto.class).getRoutes().get(0);
     }
 }
