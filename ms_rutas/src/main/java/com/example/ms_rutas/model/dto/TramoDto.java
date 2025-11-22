@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class TramoDto {
-    private String CoordenadasOrigen;
+    private String coordenadasOrigen;
     private String coordenadasDestino;
     private TipoTramo tipoTramo;
     private String estadoTramo;

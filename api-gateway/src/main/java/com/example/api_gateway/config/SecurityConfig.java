@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/contenedores/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/estados/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/contenedores/estado/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/costo-final/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/costo-final/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/costo-tiempo-real/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
@@ -81,6 +81,9 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/usuarios/*").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/*").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/camioneros").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camioneros").hasRole("ADMIN")
+
 
                         // --- 6. RUTAS COMPARTIDAS (ADMIN + TRANSPORTISTA) ---
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/*").hasAnyRole("ADMIN", "TRANSPORTISTA")

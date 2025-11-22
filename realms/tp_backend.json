@@ -83,6 +83,15 @@
         "attributes": {}
       },
       {
+        "id": "2be87845-6348-483d-b36e-806767358513",
+        "name": "transportista",
+        "description": "el transportista",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "54a145ec-b3cd-40d5-bb99-ae26a3fb53aa",
+        "attributes": {}
+      },
+      {
         "id": "74802a2c-901f-45ed-9bb4-824ec9cc74c2",
         "name": "default-roles-tp_backend",
         "description": "${role_default-roles}",
@@ -1416,13 +1425,13 @@
         "config": {
           "allowed-protocol-mapper-types": [
             "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
             "oidc-full-name-mapper",
             "oidc-address-mapper",
             "oidc-usermodel-attribute-mapper",
             "saml-user-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-role-list-mapper",
-            "saml-user-property-mapper"
+            "oidc-sha256-pairwise-sub-mapper"
           ]
         }
       },
@@ -1434,14 +1443,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-role-list-mapper",
-            "oidc-address-mapper",
-            "oidc-full-name-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper",
             "saml-user-property-mapper",
-            "saml-user-attribute-mapper"
+            "saml-user-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-address-mapper"
           ]
         }
       },

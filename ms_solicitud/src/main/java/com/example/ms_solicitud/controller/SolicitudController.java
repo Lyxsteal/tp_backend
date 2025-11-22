@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -72,7 +73,8 @@ public class SolicitudController {
     }
 
     @PutMapping("asignar-tarifa/{idSolicitud}")
-    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Integer tarifaId){
+    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Map<String, Integer> body){
+        Integer tarifaId = body.get("idTarifa"); // Extraes el ID del objeto
         return ResponseEntity.ok(service.asignarTarifa(idSolicitud, tarifaId));
     }
 

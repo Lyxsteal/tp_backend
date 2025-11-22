@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class TramoSugeridoDto {
-    private String cordenadasOrigen;
-    private String cordenadasDestino;
+    private String coordenadasOrigen;
+    private String coordenadasDestino;
     private Integer nroOrden;
 }

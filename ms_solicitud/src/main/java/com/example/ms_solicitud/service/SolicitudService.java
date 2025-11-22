@@ -226,21 +226,33 @@ public class SolicitudService {
         return historialDtos;
    }
 
-   @Transactional
+    @Transactional
     public void iniciarSolicitud(Integer idSolicitud) {
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
-       LocalDateTime fecha = LocalDateTime.now();
-       CambioEstado cambioEstado = new CambioEstado();
-       CambioEstadoId cambioEstadoId = new CambioEstadoId();
-       cambioEstadoId.setFechaCambio(fecha);
-       cambioEstadoId.setIdSolicitud(idSolicitud);
-       cambioEstado.setEstado(EstadoSolicitud.EN_CURSO);
-       cambioEstado.setSolicitud(solicitud);
-       solicitud.getCambioEstado().add(cambioEstado);
-       solicitud.setEstadoActual(EstadoSolicitud.EN_CURSO);
-       solicitud.getContenedor().setEstado("EN CAMINO");
-       Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
-   }
+        LocalDateTime fecha = LocalDateTime.now();
+
+        CambioEstado cambioEstado = new CambioEstado();
+
+        CambioEstadoId cambioEstadoId = new CambioEstadoId();
+        cambioEstadoId.setFechaCambio(fecha);
+        cambioEstadoId.setIdSolicitud(idSolicitud);
+        cambioEstado.setCambioEstadoId(cambioEstadoId);
+        cambioEstado.setEstado(EstadoSolicitud.EN_CURSO);
+        cambioEstado.setSolicitud(solicitud);
+
+        if (solicitud.getCambioEstado() == null) {
+            solicitud.setCambioEstado(new ArrayList<>());
+        }
+
+        solicitud.getCambioEstado().add(cambioEstado);
+        solicitud.setEstadoActual(EstadoSolicitud.EN_CURSO);
+
+        if (solicitud.getContenedor() != null) {
+            solicitud.getContenedor().setEstado("EN CAMINO");
+        }
+
+        solicitudRepository.save(solicitud);
+    }
 
     @Transactional
     public void reanudarViajeContenedor(Integer idSolicitud) {
@@ -259,16 +271,27 @@ public class SolicitudService {
     public void finalizarSolicitud(Integer idSolicitud) {
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
         LocalDateTime fecha = LocalDateTime.now();
+
         CambioEstado cambioEstado = new CambioEstado();
         CambioEstadoId cambioEstadoId = new CambioEstadoId();
         cambioEstadoId.setFechaCambio(fecha);
         cambioEstadoId.setIdSolicitud(idSolicitud);
+        cambioEstado.setCambioEstadoId(cambioEstadoId);
         cambioEstado.setEstado(EstadoSolicitud.FINALIZADA);
         cambioEstado.setSolicitud(solicitud);
+
+        if (solicitud.getCambioEstado() == null) {
+            solicitud.setCambioEstado(new ArrayList<>());
+        }
+
         solicitud.getCambioEstado().add(cambioEstado);
         solicitud.setEstadoActual(EstadoSolicitud.FINALIZADA);
-        solicitud.getContenedor().setEstado("ENTREGADO");
-        Solicitud solicitudActualizada = solicitudRepository.save(solicitud);
+
+        if (solicitud.getContenedor() != null) {
+            solicitud.getContenedor().setEstado("ENTREGADO");
+        }
+
+        solicitudRepository.save(solicitud);
     }
 
 }

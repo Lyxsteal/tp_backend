@@ -37,14 +37,14 @@ public class DepositoService {
         }
 
         @Transactional
-        public Deposito crearDeposito(DepositoDto depositoDto) {
+    public Deposito crearDeposito(DepositoDto depositoDto) {
         Deposito deposito = new Deposito();
         deposito.setCoordenadas(depositoDto.getCoordenadas());
         deposito.setDireccion(depositoDto.getDireccion());
         deposito.setNombre(depositoDto.getNombre());
         log.info("Deposito creado con exito");
         return depositoRepository.save(deposito);
-        }
+    }
 
         @Transactional
         public Deposito actualizarDeposito(Integer id, Deposito depositoActualizado) {

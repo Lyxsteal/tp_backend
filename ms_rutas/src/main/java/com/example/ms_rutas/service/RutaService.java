@@ -58,8 +58,8 @@ public class RutaService {
         for (TramoSugeridoDto tramoDto : rutaSugeridaDto.getTramos()) {
             Tramo tramo = new Tramo();
             tramo.setNroOrden(tramoDto.getNroOrden());
-            tramo.setCoordenadasOrigen(tramoDto.getCordenadasOrigen());
-            tramo.setCoordenadasDestino(tramoDto.getCordenadasDestino());
+            tramo.setCoordenadasOrigen(tramoDto.getCoordenadasOrigen());
+            tramo.setCoordenadasDestino(tramoDto.getCoordenadasDestino());
             tramo.setEstadoTramo("PENDIENTE");
             String tipotramoStr = "";
             if (tramo.getCoordenadasOrigen().equals(coordenadasOrigen)){
@@ -129,33 +129,55 @@ public class RutaService {
     }
 
     public Double obtenerConsumoTotal(List<Tramo> tramos){
-
         Double consumoTotal = 0.0;
 
-        if (tramos == null || tramos.size() < 1) {
+        if (tramos == null || tramos.isEmpty()) {
             return 0.0;
         }
 
-        for (int i = 0; i < tramos.size() ; i++) {
-            Double consumoCombustible = calcularDistancia(tramos.get(i)) * tramos.get(i).getCamion().getConsCombKm() / 1000;
-            consumoTotal += consumoCombustible;
+        for (Tramo tramo : tramos) {
 
+            if (tramo.getCamion() == null) {
+                log.warn("El tramo con orden {} no tiene camión asignado. Se omite del cálculo de consumo.", tramo.getNroOrden());
+                continue;
+            }
+
+            if (tramo.getCoordenadasOrigen() == null || tramo.getCoordenadasDestino() == null) {
+                log.warn("El tramo con orden {} tiene coordenadas incompletas. Se omite.", tramo.getNroOrden());
+                continue;
+            }
+
+            Double distancia = calcularDistancia(tramo);
+
+            if (distancia > 0) {
+                Double consumoCombustible = distancia * tramo.getCamion().getConsCombKm() / 1000;
+                consumoTotal += consumoCombustible;
+            }
         }
-        log.info("El consumo total es " + consumoTotal);
-        return consumoTotal;
 
+        log.info("El consumo total calculado es: " + consumoTotal);
+        return consumoTotal;
     }
+
     public Double calcularDistancia(Tramo tramo){
         String origen = tramo.getCoordenadasOrigen();
         String destino = tramo.getCoordenadasDestino();
 
+        if (origen == null || destino == null || origen.trim().isEmpty() || destino.trim().isEmpty()) {
+            log.error("No se puede calcular distancia: Coordenadas nulas en tramo ID: " + tramo.getIdTramo());
+            return 0.0;
+        }
+
         String coordenadas = origen + ";" + destino;
 
-        Double distancia = distanciaClient.obtenerDistancia(coordenadas);
-
-        log.info("Distancia calculada");
-        return distancia;
-
+        try {
+            Double distancia = distanciaClient.obtenerDistancia(coordenadas);
+            log.info("Distancia calculada: " + distancia);
+            return distancia;
+        } catch (Exception e) {
+            log.error("Error al llamar a API de distancias para coordenadas: " + coordenadas, e);
+            return 0.0;
+        }
     }
 
     public List<RutaSugeridaDto> consultarRutasTentativas(Integer idSolicitud){
@@ -186,8 +208,8 @@ public class RutaService {
         RutaSugeridaDto rutaSugeridaDto = new RutaSugeridaDto();
         rutaSugeridaDto.setNumeroDeAlternativa(1);
         TramoSugeridoDto tramoSugeridoDto = new TramoSugeridoDto();
-        tramoSugeridoDto.setCordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
-        tramoSugeridoDto.setCordenadasDestino((datosSolicitud.getCoordenadasDestino()));
+        tramoSugeridoDto.setCoordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
+        tramoSugeridoDto.setCoordenadasDestino((datosSolicitud.getCoordenadasDestino()));
         tramoSugeridoDto.setNroOrden(1);
         rutaSugeridaDto.setDuracion(tiempoYDistancia.getDuration());
         rutaSugeridaDto.setDistancia(tiempoYDistancia.getDistance());
@@ -235,13 +257,13 @@ public class RutaService {
         RutaSugeridaDto rutaSugeridaDto = new RutaSugeridaDto();
         rutaSugeridaDto.setNumeroDeAlternativa(2);
         TramoSugeridoDto tramoSugeridoDto1 = new TramoSugeridoDto();
-        tramoSugeridoDto1.setCordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
-        tramoSugeridoDto1.setCordenadasDestino(coordenadasMenor);
+        tramoSugeridoDto1.setCoordenadasOrigen(datosSolicitud.getCoordenadasOrigen());
+        tramoSugeridoDto1.setCoordenadasDestino(coordenadasMenor);
         tramoSugeridoDto1.setNroOrden(1);
         rutaSugeridaDto.getTramos().add(tramoSugeridoDto1);
         TramoSugeridoDto tramoSugeridoDto2 = new TramoSugeridoDto();
-        tramoSugeridoDto2.setCordenadasOrigen(coordenadasMenor);
-        tramoSugeridoDto2.setCordenadasDestino(datosSolicitud.getCoordenadasDestino());
+        tramoSugeridoDto2.setCoordenadasOrigen(coordenadasMenor);
+        tramoSugeridoDto2.setCoordenadasDestino(datosSolicitud.getCoordenadasDestino());
         tramoSugeridoDto2.setNroOrden(2);
         rutaSugeridaDto.getTramos().add(tramoSugeridoDto2);
         rutaSugeridaDto.setDuracion(tiempoYDistancia1.getDuration() + tiempoYDistancia2.getDuration());
