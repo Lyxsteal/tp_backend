@@ -35,8 +35,8 @@ public class RutaController {
         return rutaService.obtenerCostos(numeroRuta);
     }
     @GetMapping("/rutas-tentativas")
-    public List<RutaSugeridaDto> getRutasTentativas(@RequestParam Integer idSolicitud) {
-        return rutaService.consultarRutasTentativas(idSolicitud);
+    public List<RutaSugeridaDto> getRutasTentativas(@RequestParam Integer idSolicitud, @RequestParam Integer cantidadDepositosMax) {
+        return rutaService.consultarRutasTentativas(idSolicitud, cantidadDepositosMax);
 
     }
     //put

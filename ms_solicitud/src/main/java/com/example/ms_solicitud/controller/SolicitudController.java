@@ -73,8 +73,8 @@ public class SolicitudController {
     }
 
     @PutMapping("asignar-tarifa/{idSolicitud}")
-    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody Map<String, Integer> body){
-        Integer tarifaId = body.get("idTarifa"); // Extraes el ID del objeto
+    public ResponseEntity<Solicitud> asignarTarifa(@PathVariable Integer idSolicitud, @RequestBody AsignarTarifaDto body){
+        Integer tarifaId = body.getIdTarifa(); // Extraes el ID del objeto
         return ResponseEntity.ok(service.asignarTarifa(idSolicitud, tarifaId));
     }
 

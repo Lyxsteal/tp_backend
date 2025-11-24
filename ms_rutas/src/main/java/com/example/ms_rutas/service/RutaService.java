@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 
@@ -180,14 +182,20 @@ public class RutaService {
         }
     }
 
-    public List<RutaSugeridaDto> consultarRutasTentativas(Integer idSolicitud){
+    public List<RutaSugeridaDto> consultarRutasTentativas(Integer idSolicitud, Integer cantidadDepositosMax){
         List<RutaSugeridaDto> rutaSugeridas = new ArrayList<>();
         if (solicitudClient.verificarSolicitud(idSolicitud)) {
             log.info("Solicitud encontrada");
             DatosSolicitudDto datosSolicitudDto = solicitudClient.obtenerDatosSolicitudPorNumero(idSolicitud);
             rutaSugeridas.add(rutaSugeridaDirecta(datosSolicitudDto));
-            rutaSugeridas.add(rutaSugeridaConDeposito(datosSolicitudDto));
-
+            for(int i = 1; i <= cantidadDepositosMax ; i++){
+                log.info("Entro aca");
+                RutaSugeridaDto ruta = rutaSugeridaHeuristica(datosSolicitudDto, i);
+                if (!ruta.getTramos().isEmpty()) {
+                    ruta.setNumeroDeAlternativa(rutaSugeridas.size() + 1);
+                    rutaSugeridas.add(ruta);
+                }
+            }
         }
         else {
             log.warn("No existe la solicitud");
@@ -245,7 +253,7 @@ public class RutaService {
             else {
                 if ((distanciaOrDep <= distanciamenor) && (distanciaDepDes <= distanciaOrDes)){
                     coordenadasMenor = deposito.getCoordenadas();
-                    distanciamenor = distanciaOrDes;
+                    distanciamenor = distanciaOrDep;
                 }
             }
         }
@@ -268,6 +276,117 @@ public class RutaService {
         rutaSugeridaDto.getTramos().add(tramoSugeridoDto2);
         rutaSugeridaDto.setDuracion(tiempoYDistancia1.getDuration() + tiempoYDistancia2.getDuration());
         rutaSugeridaDto.setDistancia(tiempoYDistancia1.getDistance() + tiempoYDistancia2.getDistance());
+        Double consPromCamiones = camionRepository.promedioConsumo(datosSolicitud.getVolumenContendor(), datosSolicitud.getPesoContenedor());
+        Double costo = datosSolicitud.getValorVolumenTarifa()* datosSolicitud.getVolumenContendor() + datosSolicitud.getValorTramoTarifa()*rutaSugeridaDto.getTramos().size() + consPromCamiones * rutaSugeridaDto.getDistancia()/1000;
+        rutaSugeridaDto.setCostoEstimado(costo);
+        return rutaSugeridaDto;
+
+    }
+    public RutaSugeridaDto rutaSugeridaHeuristica(DatosSolicitudDto datosSolicitud, int limiteDepositos) {
+        List<Deposito> depositos = depositoRepository.findAll();
+
+
+        // Calculo de distancia Origen-Destino
+        String coordenadasOrigen = datosSolicitud.getCoordenadasOrigen().replace(" ","").trim();
+        String[] partesOrigen = coordenadasOrigen.split(",");
+        String latitudOr = partesOrigen[0];
+        String longitudOr = partesOrigen[1];
+
+        String coordenadasDestino = datosSolicitud.getCoordenadasDestino().replace(" ","").trim();
+        String[] partesDestino = coordenadasDestino.split(",");
+        String latitudDes = partesDestino[0];
+        String longitudDes = partesDestino[1];
+
+        Double distanciaOrDes = distanciaClient.obtenerDistancia( longitudOr + "," + latitudOr + ";" + longitudDes + "," + latitudDes);
+        System.out.println("La distancia origen-deposito es " + distanciaOrDes);
+
+        String coordenadasActual = coordenadasOrigen;
+
+        //Mapeo de coordenadas de depositos no visitados, con coordenadas limpias
+        Set<String> depositosNoVisitados = depositos.stream()
+                .map(deposito -> deposito.getCoordenadas().replace(" ", "").trim()) // Obtenemos solo las coordenadas
+                .collect(Collectors.toSet()); // Creamos un Set para las búsquedas eficientes
+
+
+        RutaSugeridaDto rutaSugeridaDto = new RutaSugeridaDto();
+        List<OsrmRouteDto> tiemposYDistancias = new ArrayList<>();
+        // AÑADIR CONTADOR
+        int depositosVisitadosCount = 0;
+
+        //El while termina si el contador alcanza el límite o si no quedan depósitos.
+        while (depositosVisitadosCount < limiteDepositos && !depositosNoVisitados.isEmpty()) {
+
+            String coordenadasMejorVecino = null;
+            double distanciaMinima = Double.MAX_VALUE;
+
+            String[] partesActual = coordenadasActual.split(",");
+            String longitudActual = partesActual[1];
+            String latitudActual = partesActual[0];
+
+            // ... (Lógica para encontrar el depósito más cercano al punto actual - igual que antes) ...
+            for (Deposito candidato : depositos) {
+                String coordCandidato = candidato.getCoordenadas().replace(" ", "").trim();
+
+                if (depositosNoVisitados.contains(coordCandidato)) {
+                    String[] coordDeposito = coordCandidato.split(",");
+                    String latitudDep = coordDeposito[0];
+                    String longitudDep = coordDeposito[1];
+                    Double distanciaActual = distanciaClient.obtenerDistancia(longitudActual + "," + latitudActual + ";" + longitudDep + "," + latitudDep);
+
+                    Double distanciaDepDes = distanciaClient.obtenerDistancia(longitudDep + "," + latitudDep + ";" + longitudDes + "," + latitudDes);
+
+                    Double distanciaTotal = distanciaActual + distanciaDepDes;
+
+                    log.info("La distancia total de deposito anterior-deposito nuevo-destino es " + distanciaTotal);
+
+                    if ((distanciaTotal < distanciaMinima) && (distanciaActual < distanciaOrDes) && (distanciaDepDes <= distanciaOrDes)) {
+                        distanciaMinima = distanciaTotal;
+                        coordenadasMejorVecino = coordCandidato;
+                    }
+                }
+            }
+
+            // Si se encontró un vecino, se mueve a él
+            if (coordenadasMejorVecino != null) {
+
+                String[] partesElegido = coordenadasMejorVecino.split(",");
+                String lonElec = partesElegido[1];
+                String latElec = partesElegido[0];
+                tiemposYDistancias.add(distanciaClient.obtenerTiempoYDistancia(longitudActual + "," + latitudActual + ";" + lonElec + "," + latElec));
+
+                depositosNoVisitados.remove(coordenadasMejorVecino);
+                depositosVisitadosCount++;
+
+                TramoSugeridoDto tramoSugeridoDto = new TramoSugeridoDto();
+                tramoSugeridoDto.setCoordenadasOrigen(coordenadasActual);
+                tramoSugeridoDto.setCoordenadasDestino(coordenadasMejorVecino);
+                tramoSugeridoDto.setNroOrden(rutaSugeridaDto.getTramos().size() + 1);
+                rutaSugeridaDto.getTramos().add(tramoSugeridoDto);
+                log.info("Tramo añadido, coordenadas deposito origen " + coordenadasActual + "coordenadas deposito destino" + coordenadasMejorVecino);
+                coordenadasActual = coordenadasMejorVecino;
+            } else {
+                log.info("No se encontro deposito");
+                break; // No hay más depósitos disponibles
+            }
+        }
+
+        // Calculo del ultimo deposito al destino
+        String[] ultimasCoordActual = coordenadasActual.split(",");
+        String latUltDep = ultimasCoordActual[0];
+        String longUltDep = ultimasCoordActual[1];
+        OsrmRouteDto tFinal = distanciaClient.obtenerTiempoYDistancia(longUltDep + "," + latUltDep + ";" + longitudDes + "," + latitudDes);
+        TramoSugeridoDto tramoSugeridoDto = new TramoSugeridoDto();
+        tramoSugeridoDto.setCoordenadasOrigen(coordenadasActual);
+        tramoSugeridoDto.setCoordenadasDestino(coordenadasDestino);
+        tramoSugeridoDto.setNroOrden(rutaSugeridaDto.getTramos().size() + 1);
+        rutaSugeridaDto.getTramos().add(tramoSugeridoDto);
+        tiemposYDistancias.add(tFinal);
+
+        // Construccion rutaSugeridaDto
+        Double distanciaTotal = tiemposYDistancias.stream().mapToDouble(OsrmRouteDto::getDistance).sum();
+        Double tiempoTotal = tiemposYDistancias.stream().mapToDouble(OsrmRouteDto::getDuration).sum();
+        rutaSugeridaDto.setDuracion(tiempoTotal);
+        rutaSugeridaDto.setDistancia(distanciaTotal);
         Double consPromCamiones = camionRepository.promedioConsumo(datosSolicitud.getVolumenContendor(), datosSolicitud.getPesoContenedor());
         Double costo = datosSolicitud.getValorVolumenTarifa()* datosSolicitud.getVolumenContendor() + datosSolicitud.getValorTramoTarifa()*rutaSugeridaDto.getTramos().size() + consPromCamiones * rutaSugeridaDto.getDistancia()/1000;
         rutaSugeridaDto.setCostoEstimado(costo);
