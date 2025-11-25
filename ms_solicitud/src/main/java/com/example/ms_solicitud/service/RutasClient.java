@@ -27,9 +27,9 @@ public class RutasClient {
         this.msRutasBaseUrl = msRutasBaseUrl;
     }
 
-    public List<RutaSugeridaDto> buscarRutastentativas(Integer idSolicitud) {
-        // Usamos la URL base + el endpoint
-        String url = msRutasBaseUrl + "/api/v1/rutas/rutas-tentativas?idSolicitud=" + idSolicitud;
+    public List<RutaSugeridaDto> buscarRutastentativas(Integer idSolicitud, Integer cantidadDepositosMax) {
+
+        String url = msRutasBaseUrl + "/api/v1/rutas/rutas-tentativas?idSolicitud=" + idSolicitud+ "&cantidadDepositosMax=" + cantidadDepositosMax;;
         RutaSugeridaDto[] rutasSugeridas = restTemplate.getForObject(url,  RutaSugeridaDto[].class);
 
         return Arrays.asList(rutasSugeridas);

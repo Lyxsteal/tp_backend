@@ -3,7 +3,6 @@ package com.example.api_gateway.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -27,72 +26,52 @@ public class SecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex
-
-                        // --- 1. RUTAS PÚBLICAS Y DE LOGIN ---
+                        // ============================================================
+                        // 1. ACCESO PÚBLICO
+                        // ============================================================
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/inicio-sesion").permitAll()
-                        // (Rutas de callback de Keycloak)
                         .pathMatchers("/oauth2/**", "/login/**").permitAll()
-                        .pathMatchers("/gateway/whoami").authenticated() // Tu endpoint de prueba
+                        .pathMatchers("/gateway/whoami").authenticated()
 
-                        // --- 2. RUTAS DE TRANSPORTISTA  ---
+                        // ============================================================
+                        // 2. REGLAS ESPECÍFICAS (Excepciones para Roles No-Admin)
+                        // ============================================================
+
+                        // --- Transportista ---
                         .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/tramos-asignados/**").hasRole("TRANSPORTISTA")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/iniciar-tramo/*").hasRole("TRANSPORTISTA")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/finalizar-tramo/*").hasRole("TRANSPORTISTA")
 
-                        // --- 3. RUTAS DE CLIENTE ---
+                        // --- Cliente ---
                         .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/clientes").hasRole("CLIENTE")
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/clientes/*").hasRole("CLIENTE")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes").hasAnyRole("ADMIN", "CLIENTE")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/contenedores/estado/*").hasRole("CLIENTE")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/estimados/*").hasRole("CLIENTE") //get de costo y tiempo estimado
-                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/{id}").hasRole("CLIENTE")
 
-                        // --- 4. RUTAS DE ADMIN (Específicas de Solicitud) ---
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/contenedores/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/estados/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/contenedores/estado/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/costo-final/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/costo-tiempo-real/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/solicitudes/tarifas/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.DELETE, "/api/v1/solicitudes/**").hasRole("ADMIN")
-
-                        // --- 5. RUTAS DE ADMIN (Rutas, Camiones, Usuarios, etc.) ---
-                        .pathMatchers(HttpMethod.GET, "/api/v1/deposito/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/deposito/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/tramos/sugeridos/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/camion/**").hasRole("ADMIN") 
-                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/depositos").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/depositos/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/camiones").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/camiones/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/camion/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/capacidad-maxima/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/camiones-aptos").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/costobase/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camiones/consumo-prom/**").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/ciudades").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/ciudades").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/ciudades/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/usuarios/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/*").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST, "/api/v1/rutas/camioneros").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/camioneros").hasRole("ADMIN")
-
-
-                        // --- 6. RUTAS COMPARTIDAS (ADMIN + TRANSPORTISTA) ---
+                        // --- Compartidos (Admin + Otros) ---
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/{id}").hasAnyRole("ADMIN", "CLIENTE")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/solicitudes").hasAnyRole("ADMIN", "CLIENTE")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/solicitudes/costo-final/*").hasAnyRole("ADMIN", "CLIENTE")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/rutas/tramos/*").hasAnyRole("ADMIN", "TRANSPORTISTA")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/rutas/rutas-tentativas").hasAnyRole("ADMIN", "CLIENTE")
 
-                        // --- 7. CIERRE ---
-                        // (Cualquier otra ruta no definida aquí, requiere al menos estar autenticado)
+                        // ============================================================
+                        // 3. REGLAS GENERALES (Catch-All para ADMIN)
+                        // ============================================================
+
+                        // Todo lo demás de solicitudes (tarifas, contenedores, ABM, etc.) -> ADMIN
+                        .pathMatchers("/api/v1/solicitudes/**").hasRole("ADMIN")
+
+                        // Todo lo demás de rutas (camiones, depositos, calculos, ciudades) -> ADMIN
+                        .pathMatchers("/api/v1/rutas/**").hasRole("ADMIN")
+
+                        // Gestión de usuarios -> ADMIN
+                        .pathMatchers("/api/v1/usuarios/**").hasRole("ADMIN")
+
+                        // ============================================================
+                        // 4. CIERRE (Cualquier otra cosa requiere login)
+                        // ============================================================
                         .anyExchange().authenticated()
                 )
-
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return http.build();
@@ -105,7 +84,6 @@ public class SecurityConfig {
             if (realmAccess == null || realmAccess.isEmpty()) {
                 return Collections.emptyList();
             }
-
             Collection<String> roles = (Collection<String>) realmAccess.get("roles");
             return roles.stream()
                     .map(roleName -> "ROLE_" + roleName.toUpperCase())

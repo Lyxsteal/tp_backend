@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -144,7 +145,7 @@ public class SolicitudService {
     @Transactional
     public Solicitud asignarRuta(Integer idSolicitud) {
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
-        List<RutaSugeridaDto> rutasSugeridas = rutasClient.buscarRutastentativas(idSolicitud);
+        List<RutaSugeridaDto> rutasSugeridas = rutasClient.buscarRutastentativas(idSolicitud, 2);
         RutaSugeridaDto rutaSugeridaSeleccionada = null;
         Double costoAproximado = 0.0;
         for(RutaSugeridaDto rutaSugerida : rutasSugeridas) {
@@ -271,6 +272,7 @@ public class SolicitudService {
     public void finalizarSolicitud(Integer idSolicitud) {
         Solicitud solicitud = obtenerSolicitudPorNumero(idSolicitud);
         LocalDateTime fecha = LocalDateTime.now();
+        LocalDateTime fechaFin = LocalDateTime.now();
 
         CambioEstado cambioEstado = new CambioEstado();
         CambioEstadoId cambioEstadoId = new CambioEstadoId();
@@ -291,6 +293,25 @@ public class SolicitudService {
             solicitud.getContenedor().setEstado("ENTREGADO");
         }
 
+        solicitud.getCambioEstado().stream()
+                .filter(c -> c.getEstado() == EstadoSolicitud.EN_CURSO)
+                .findFirst()
+                .ifPresent(inicio -> {
+                    LocalDateTime fechaInicio = inicio.getCambioEstadoId().getFechaCambio();
+                    long segundos = Duration.between(fechaInicio, fechaFin).getSeconds();
+                    solicitud.setTiempoReal((double) segundos);
+                });
+
+        try {
+            CostoFinalDto costosReales = rutasClient.getCostos(solicitud.getIdRuta());
+
+            Double costoCalculado = solicitud.getIdTarifa().calcularCostos(costosReales, solicitud.getContenedor().getVolumen());
+            solicitud.setCostoFinal(costoCalculado);
+
+            log.info("Costo final calculado y guardado: " + costoCalculado);
+        } catch (Exception e) {
+            log.error("Error al calcular el costo final: " + e.getMessage());
+        }
         solicitudRepository.save(solicitud);
     }
 

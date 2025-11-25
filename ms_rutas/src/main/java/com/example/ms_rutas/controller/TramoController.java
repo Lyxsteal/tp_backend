@@ -56,13 +56,13 @@ public class TramoController {
     }
 
     @PutMapping("/iniciar-tramo/{idTramo}")
-    public ResponseEntity<Tramo> iniciarTramo(@PathVariable Integer idTramo, @RequestBody Integer idSolicitud){
+    public ResponseEntity<Tramo> iniciarTramo(@PathVariable Integer idTramo){
         return ResponseEntity.ok(tramoService.iniciarTramo(idTramo));
     }
 
     //put
     @PutMapping("/finalizar-tramo/{idTramo}")
-    public ResponseEntity<Tramo> finalizarTramo(@PathVariable Integer idTramo, @RequestBody Integer idSolicitud) {
+    public ResponseEntity<Tramo> finalizarTramo(@PathVariable Integer idTramo) {
         return ResponseEntity.ok(tramoService.finalizarTramo(idTramo));
     }
 

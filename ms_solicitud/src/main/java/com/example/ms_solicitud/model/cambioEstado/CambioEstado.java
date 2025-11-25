@@ -1,6 +1,7 @@
 package com.example.ms_solicitud.model.cambioEstado;
 import com.example.ms_solicitud.model.EstadoSolicitud;
 import com.example.ms_solicitud.model.Solicitud;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,8 @@ public class CambioEstado {
     @Column(name="estado")
     private EstadoSolicitud estado;
 
+    @JsonIgnore
     @ManyToOne
-    @MapsId("idSolicitud")  // <- mapea el ID al campo de la PK
+    @MapsId("idSolicitud")
     private Solicitud solicitud;
 }

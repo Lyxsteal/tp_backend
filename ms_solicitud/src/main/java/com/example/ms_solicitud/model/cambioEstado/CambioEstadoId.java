@@ -1,5 +1,6 @@
 package com.example.ms_solicitud.model.cambioEstado;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import lombok.*;
@@ -12,9 +13,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
+
 public class CambioEstadoId implements Serializable {
 
+    @JsonIgnore
     private Integer idSolicitud;
+
     private LocalDateTime fechaCambio;
 
 }
